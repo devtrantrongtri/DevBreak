@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack -p 6969",
+    "dev": "next dev --turbopack -p 3001",
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint"
@@ -13,9 +13,14 @@
     "@geist-ui/react": "^2.2.5",
     "@vercel/analytics": "^1.5.0",
     "antd": "^5.27.3",
+    "i18next": "^25.5.2",
     "next": "15.5.2",
+    "nextjs-toploader": "^3.9.17",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "react-error-boundary": "^6.0.0",
+    "react-i18next": "^15.7.3",
+    "recharts": "^3.2.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
