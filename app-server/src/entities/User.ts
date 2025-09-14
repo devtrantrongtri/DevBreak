@@ -6,16 +6,16 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ unique: true })
-  username: string;
+  @Column({ unique: true, comment: 'Email address used for login' })
+  email: string;
 
-  @Column()
-  passwordHash: string;
+  @Column({ comment: 'Hashed password' })
+  passwordHash?: string;
 
-  @Column()
-  fullName: string;
+  @Column({ comment: 'Display name of the user' })
+  displayName: string;
 
-  @Column({ default: true })
+  @Column({ default: true, comment: 'Whether the user account is active' })
   isActive: boolean;
 
   @ManyToMany(() => Group, (group) => group.users)
