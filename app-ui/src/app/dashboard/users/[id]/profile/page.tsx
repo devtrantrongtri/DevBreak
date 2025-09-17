@@ -35,8 +35,10 @@ import { UserResponse } from '@/types/api';
 import { useAuth } from '@/contexts/AuthContext';
 import ActivityLog from '@/components/common/ActivityLog';
 
+
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
+
 
 const UserProfilePage: React.FC = () => {
   const [user, setUser] = useState<UserResponse | null>(null);
@@ -48,13 +50,16 @@ const UserProfilePage: React.FC = () => {
   const userId = params.id as string;
   const { permissions } = useAuth();
 
+
   const canUpdateUser = permissions.includes('user.update');
+
 
   useEffect(() => {
     if (userId) {
       fetchUser();
     }
   }, [userId]);
+
 
   const fetchUser = async () => {
     try {
@@ -67,27 +72,29 @@ const UserProfilePage: React.FC = () => {
         isActive: response.isActive,
       });
     } catch (error) {
-      message.error('Failed to fetch user details');
+      message.error('Không thể lấy thông tin người dùng');
       console.error('Error fetching user:', error);
     } finally {
       setLoading(false);
     }
   };
 
+
   const handleSave = async (values: any) => {
     try {
       setSaving(true);
       await apiClient.updateUser(userId, values);
-      message.success('User profile updated successfully');
+      message.success('Cập nhật hồ sơ người dùng thành công');
       fetchUser();
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 'Failed to update user profile';
+      const errorMessage = error?.response?.data?.message || 'Không thể cập nhật hồ sơ người dùng';
       message.error(errorMessage);
       console.error('Error updating user:', error);
     } finally {
       setSaving(false);
     }
   };
+
 
   if (loading) {
     return (
@@ -97,13 +104,15 @@ const UserProfilePage: React.FC = () => {
     );
   }
 
+
   if (!user) {
     return (
       <div style={{ textAlign: 'center', padding: '50px' }}>
-        <Text>User not found</Text>
+        <Text>Không tìm thấy người dùng</Text>
       </div>
     );
   }
+
 
 
 
@@ -116,18 +125,19 @@ const UserProfilePage: React.FC = () => {
               icon={<ArrowLeftOutlined />}
               onClick={() => router.push('/dashboard/users')}
             >
-              Back to Users
+              Quay lại Danh sách
             </Button>
             <Title level={2} style={{ margin: 0 }}>
-              <UserOutlined /> User Profile
+              <UserOutlined /> Hồ sơ người dùng
             </Title>
           </Space>
         </Col>
       </Row>
 
+
       <Row gutter={[24, 24]}>
         <Col xs={24} lg={8}>
-          <Card title="Profile Overview">
+          <Card title="Tổng quan hồ sơ">
             <div style={{ textAlign: 'center', marginBottom: 24 }}>
               <Avatar size={80} icon={<UserOutlined />} />
               <div style={{ marginTop: 16 }}>
@@ -138,15 +148,17 @@ const UserProfilePage: React.FC = () => {
               </div>
               <div style={{ marginTop: 16 }}>
                 <Tag color={user.isActive ? 'green' : 'red'}>
-                  {user.isActive ? 'Active' : 'Inactive'}
+                  {user.isActive ? 'Đang hoạt động' : 'Không hoạt động'}
                 </Tag>
               </div>
             </div>
 
+
             <Divider />
 
+
             <div>
-              <Text strong>Groups:</Text>
+              <Text strong>Nhóm:</Text>
               <div style={{ marginTop: 8 }}>
                 {user.groups && user.groups.length > 0 ? (
                   user.groups.map(group => (
@@ -155,27 +167,30 @@ const UserProfilePage: React.FC = () => {
                     </Tag>
                   ))
                 ) : (
-                  <Text type="secondary">No groups assigned</Text>
+                  <Text type="secondary">Chưa được gán nhóm</Text>
                 )}
               </div>
             </div>
 
+
             <Divider />
 
+
             <div>
-              <Text strong>Account Details:</Text>
+              <Text strong>Thông tin tài khoản:</Text>
               <div style={{ marginTop: 8 }}>
-                <div><Text type="secondary">Created:</Text> {new Date(user.createdAt).toLocaleDateString()}</div>
-                <div><Text type="secondary">Updated:</Text> {new Date(user.updatedAt).toLocaleDateString()}</div>
+                <div><Text type="secondary">Ngày tạo:</Text> {new Date(user.createdAt).toLocaleDateString()}</div>
+                <div><Text type="secondary">Cập nhật:</Text> {new Date(user.updatedAt).toLocaleDateString()}</div>
                 <div><Text type="secondary">ID:</Text> <Text code>{user.id}</Text></div>
               </div>
             </div>
           </Card>
         </Col>
 
+
         <Col xs={24} lg={16}>
           <Tabs defaultActiveKey="profile">
-            <TabPane tab="Profile Settings" key="profile">
+            <TabPane tab="Cài đặt hồ sơ" key="profile">
               <Card>
                 <Form
                   form={form}
@@ -187,40 +202,41 @@ const UserProfilePage: React.FC = () => {
                     <Col xs={24} md={12}>
                       <Form.Item
                         name="email"
-                        label="Email Address"
+                        label="Địa chỉ Email"
                         rules={[
-                          { required: true, message: 'Email is required' },
-                          { type: 'email', message: 'Please enter a valid email' },
+                          { required: true, message: 'Email là bắt buộc' },
+                          { type: 'email', message: 'Vui lòng nhập email hợp lệ' },
                         ]}
                       >
-                        <Input placeholder="Enter email address" />
+                        <Input placeholder="Nhập địa chỉ email" />
                       </Form.Item>
                     </Col>
                     <Col xs={24} md={12}>
                       <Form.Item
                         name="displayName"
-                        label="Display Name"
+                        label="Tên hiển thị"
                         rules={[
-                          { required: true, message: 'Display name is required' },
-                          { min: 2, message: 'Display name must be at least 2 characters' },
+                          { required: true, message: 'Tên hiển thị là bắt buộc' },
+                          { min: 2, message: 'Tên hiển thị phải có ít nhất 2 ký tự' },
                         ]}
                       >
-                        <Input placeholder="Enter display name" />
+                        <Input placeholder="Nhập tên hiển thị" />
                       </Form.Item>
                     </Col>
                     <Col xs={24}>
                       <Form.Item
                         name="isActive"
-                        label="Account Status"
+                        label="Trạng thái tài khoản"
                         valuePropName="checked"
                       >
                         <Switch
-                          checkedChildren="Active"
-                          unCheckedChildren="Inactive"
+                          checkedChildren="Hoạt động"
+                          unCheckedChildren="Không hoạt động"
                         />
                       </Form.Item>
                     </Col>
                   </Row>
+
 
                   {canUpdateUser && (
                     <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
@@ -230,7 +246,7 @@ const UserProfilePage: React.FC = () => {
                         icon={<SaveOutlined />}
                         loading={saving}
                       >
-                        Save Changes
+                        Lưu thay đổi
                       </Button>
                     </Form.Item>
                   )}
@@ -238,8 +254,9 @@ const UserProfilePage: React.FC = () => {
               </Card>
             </TabPane>
 
-            <TabPane tab="Activity Log" key="activity">
-              <Card title={<><HistoryOutlined /> Recent Activity</>}>
+
+            <TabPane tab="Nhật ký hoạt động" key="activity">
+              <Card title={<><HistoryOutlined /> Hoạt động gần đây</>}>
                 <ActivityLog
                   userId={userId}
                   showUser={false}
@@ -249,10 +266,11 @@ const UserProfilePage: React.FC = () => {
               </Card>
             </TabPane>
 
-            <TabPane tab="Permissions" key="permissions">
-              <Card title={<><SafetyCertificateOutlined /> Effective Permissions</>}>
+
+            <TabPane tab="Quyền hạn" key="permissions">
+              <Card title={<><SafetyCertificateOutlined /> Quyền hạn hiệu lực</>}>
                 <Text type="secondary" style={{ marginBottom: 16, display: 'block' }}>
-                  Permissions inherited from assigned groups:
+                  Quyền hạn được kế thừa từ các nhóm đã gán:
                 </Text>
                 <div>
                   {user.groups?.map(group => (
@@ -263,10 +281,10 @@ const UserProfilePage: React.FC = () => {
                           <Tag key={permission.id} style={{ margin: '2px' }}>
                             {permission.name}
                           </Tag>
-                        )) || <Text type="secondary">No permissions</Text>}
+                        )) || <Text type="secondary">Không có quyền hạn</Text>}
                       </div>
                     </div>
-                  )) || <Text type="secondary">No groups assigned</Text>}
+                  )) || <Text type="secondary">Chưa được gán nhóm</Text>}
                 </div>
               </Card>
             </TabPane>
@@ -276,5 +294,6 @@ const UserProfilePage: React.FC = () => {
     </div>
   );
 };
+
 
 export default UserProfilePage;

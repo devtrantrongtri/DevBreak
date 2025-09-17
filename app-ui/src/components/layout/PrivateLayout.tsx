@@ -94,22 +94,22 @@ const PrivateLayout: React.FC<PrivateLayoutProps> = ({ children }) => {
   const [openKeys, setOpenKeys] = useState<string[]>([]);
 
   // Find if a menu item has children
-  const hasChildren = (path: string): boolean => {
-    const findItemWithChildren = (items: MenuItem[]): boolean => {
-      for (const item of items) {
-        if (item.path === path && item.children && item.children.length > 0) {
-          return true;
-        }
-        if (item.children && item.children.length > 0) {
-          const found = findItemWithChildren(item.children);
-          if (found) return true;
-        }
-      }
-      return false;
-    };
+  // const hasChildren = (path: string): boolean => {
+  //   const findItemWithChildren = (items: MenuItem[]): boolean => {
+  //     for (const item of items) {
+  //       if (item.path === path && item.children && item.children.length > 0) {
+  //         return true;
+  //       }
+  //       if (item.children && item.children.length > 0) {
+  //         const found = findItemWithChildren(item.children);
+  //         if (found) return true;
+  //       }
+  //     }
+  //     return false;
+  //   };
     
-    return findItemWithChildren(menuTree);
-  };
+  //   return findItemWithChildren(menuTree);
+  // };
 
   const onClick: MenuProps['onClick'] = (e) => {
     // Always navigate to the page if it starts with '/'
@@ -304,7 +304,7 @@ const PrivateLayout: React.FC<PrivateLayoutProps> = ({ children }) => {
         <Content
           style={{
             minHeight: 'calc(100vh - 64px)',
-            padding: '24px',
+            padding: '0 24px',
             background: '#f5f5f5',
             overflow: 'auto'
           }}

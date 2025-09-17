@@ -135,7 +135,7 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
   };
 
   return (
-    <Card size="small" style={{ marginBottom: 16 }}>
+    <Card size="small" style={{ marginBottom: 8, padding: 0 }} bodyStyle={{ padding: '8px 12px' }}>
       <Form
         form={form}
         layout="vertical"
@@ -145,39 +145,42 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
         }}
       >
         {/* Basic Search */}
-        <Row gutter={[16, 16]} align="bottom">
+        <Row gutter={[8, 8]} align="bottom">
           <Col xs={24} sm={12} lg={8}>
-            <Form.Item name="searchText" label="Tìm kiếm">
+            <Form.Item name="searchText" >
               <Input
                 prefix={<SearchOutlined />}
                 placeholder="Tìm theo email, tên hiển thị..."
                 allowClear
+                size="small"
               />
             </Form.Item>
           </Col>
           <Col xs={24} sm={6} lg={4}>
-            <Form.Item name="status" label="Trạng thái">
-              <Select>
+            <Form.Item name="status" >
+              <Select size="small">
                 <Option value="all">Tất cả</Option>
                 <Option value="active">Hoạt động</Option>
                 <Option value="inactive">Không hoạt động</Option>
               </Select>
             </Form.Item>
           </Col>
-          <Col xs={24} sm={6} lg={4}>
-            <Form.Item label=" ">
+          <Col xs={24} sm={3} lg={2}>
+            <Form.Item >
               <Space>
                 <Button 
                   type="primary" 
                   htmlType="submit" 
                   icon={<SearchOutlined />}
                   loading={loading}
+                  size="small"
                 >
                   Tìm kiếm
                 </Button>
                 <Button 
                   icon={<ClearOutlined />} 
                   onClick={handleClear}
+                  size="small"
                 >
                   Xóa bộ lọc
                 </Button>
@@ -187,8 +190,9 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
         </Row>
 
         {/* Advanced Filters */}
-        <Collapse ghost>
+        <Collapse ghost style={{ marginTop: -16 }}>
           <Panel 
+            style={{ padding: 0 }}
             header={
               <Space>
                 <FilterOutlined />
@@ -202,14 +206,15 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
             } 
             key="advanced"
           >
-            <Row gutter={[16, 16]}>
+            <Row gutter={[8, 0]}>
               <Col xs={24} sm={12} lg={8}>
-                <Form.Item name="groups" label="Nhóm quyền">
+                <Form.Item name="groups" label="Nhóm quyền" style={{ marginBottom: 8 }}>
                   <Select
                     mode="multiple"
                     placeholder="Chọn nhóm quyền"
                     allowClear
                     showSearch
+                    size="small"
                     filterOption={(input, option) =>
                       (option?.children as string)?.toLowerCase().includes(input.toLowerCase())
                     }
@@ -226,20 +231,22 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
                 </Form.Item>
               </Col>
               <Col xs={24} sm={12} lg={8}>
-                <Form.Item name="createdDateRange" label="Ngày tạo">
+                <Form.Item name="createdDateRange" label="Ngày tạo" style={{ marginBottom: 8 }}>
                   <RangePicker
                     style={{ width: '100%' }}
                     placeholder={['Từ ngày', 'Đến ngày']}
                     format="DD/MM/YYYY"
+                    size="small"
                   />
                 </Form.Item>
               </Col>
               <Col xs={24} sm={12} lg={8}>
-                <Form.Item name="dateRange" label="Ngày cập nhật">
+                <Form.Item name="dateRange" label="Ngày cập nhật" style={{ marginBottom: 8 }}>
                   <RangePicker
                     style={{ width: '100%' }}
                     placeholder={['Từ ngày', 'Đến ngày']}
                     format="DD/MM/YYYY"
+                    size="small"
                   />
                 </Form.Item>
               </Col>
@@ -250,7 +257,7 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
 
       {/* Active Filters Display */}
       {activeFilters.length > 0 && (
-        <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid #f0f0f0' }}>
+        <div style={{ marginTop: 0, paddingTop: 2, borderTop: '1px solid #f0f0f0' }}>
           <Space wrap>
             <Text type="secondary">Bộ lọc đang áp dụng:</Text>
             {activeFilters.map(filterKey => {

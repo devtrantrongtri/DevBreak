@@ -28,8 +28,10 @@ import { apiClient } from '@/lib/api';
 import { UpdateGroupDto, GroupResponse, PermissionResponse } from '@/types/api';
 import type { DataNode } from 'antd/es/tree';
 
+
 const { Title, Text } = Typography;
 const { TextArea } = Input;
+
 
 const EditGroupPage: React.FC = () => {
   const [form] = Form.useForm();
@@ -43,11 +45,13 @@ const EditGroupPage: React.FC = () => {
   const params = useParams();
   const groupId = params.id as string;
 
+
   useEffect(() => {
     if (groupId) {
       fetchGroupAndPermissions();
     }
   }, [groupId]);
+
 
   const fetchGroupAndPermissions = async () => {
     try {
@@ -71,22 +75,24 @@ const EditGroupPage: React.FC = () => {
           isActive: groupDetail.isActive,
         });
 
+
         // Expand all parent nodes by default
         const parentKeys = permissionsResponse
           .filter(p => !p.parentCode)
           .map(p => p.code);
         setExpandedKeys(parentKeys);
       } else {
-        message.error('Group not found');
+        message.error('Không tìm thấy nhóm');
         router.push('/dashboard/groups');
       }
     } catch (error) {
-      message.error('Failed to fetch group details');
+      message.error('Không thể tải thông tin nhóm');
       console.error('Error fetching group details:', error);
     } finally {
       setPageLoading(false);
     }
   };
+
 
   const handleSubmit = async (values: UpdateGroupDto) => {
     try {
@@ -98,10 +104,10 @@ const EditGroupPage: React.FC = () => {
       // Update permissions
       await apiClient.assignGroupPermissions(groupId, selectedPermissions);
       
-      message.success('Group updated successfully');
-      router.push(`/dashboard/groups/${groupId}`);
+      message.success('Cập nhật nhóm thành công');
+      router.push(`/dashboard/groups/${groupId}` );
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 'Failed to update group';
+      const errorMessage = error?.response?.data?.message || 'Không thể cập nhật nhóm';
       message.error(errorMessage);
       console.error('Error updating group:', error);
     } finally {
@@ -109,15 +115,17 @@ const EditGroupPage: React.FC = () => {
     }
   };
 
+
   const validateCode = (_: any, value: string) => {
     if (!value) {
-      return Promise.reject(new Error('Group code is required'));
+      return Promise.reject(new Error('Mã nhóm là bắt buộc'));
     }
     if (!/^[a-zA-Z0-9_-]+$/.test(value)) {
-      return Promise.reject(new Error('Group code can only contain letters, numbers, underscores, and hyphens'));
+      return Promise.reject(new Error('Mã nhóm chỉ được chứa chữ cái, số, dấu gạch dưới và gạch ngang'));
     }
     return Promise.resolve();
   };
+
 
   const buildPermissionTree = (): DataNode[] => {
     const permissionMap = new Map<string, PermissionResponse>();
@@ -127,6 +135,7 @@ const EditGroupPage: React.FC = () => {
     permissions.forEach(permission => {
       permissionMap.set(permission.code, permission);
     });
+
 
     // Build tree structure
     permissions.forEach(permission => {
@@ -149,6 +158,7 @@ const EditGroupPage: React.FC = () => {
         children: [],
       };
 
+
       if (!permission.parentCode) {
         rootNodes.push(node);
       } else {
@@ -163,8 +173,10 @@ const EditGroupPage: React.FC = () => {
       }
     });
 
+
     return rootNodes;
   };
+
 
   const findNodeByKey = (nodes: DataNode[], key: string): DataNode | null => {
     for (const node of nodes) {
@@ -179,6 +191,7 @@ const EditGroupPage: React.FC = () => {
     return null;
   };
 
+
   const handlePermissionToggle = (permissionCode: string, checked: boolean) => {
     if (checked) {
       setSelectedPermissions(prev => [...prev, permissionCode]);
@@ -187,13 +200,16 @@ const EditGroupPage: React.FC = () => {
     }
   };
 
+
   const handleSelectAll = () => {
     setSelectedPermissions(permissions.map(p => p.code));
   };
 
+
   const handleDeselectAll = () => {
     setSelectedPermissions([]);
   };
+
 
   if (pageLoading) {
     return (
@@ -203,15 +219,18 @@ const EditGroupPage: React.FC = () => {
     );
   }
 
+
   if (!group) {
     return (
       <div style={{ textAlign: 'center', padding: '50px' }}>
-        <Text>Group not found</Text>
+        <Text>Không tìm thấy nhóm</Text>
       </div>
     );
   }
 
+
   const permissionTree = buildPermissionTree();
+
 
   return (
     <div>
@@ -220,20 +239,21 @@ const EditGroupPage: React.FC = () => {
           <Space>
             <Button
               icon={<ArrowLeftOutlined />}
-              onClick={() => router.push(`/dashboard/groups/${groupId}`)}
+              onClick={() => router.push(`/dashboard/groups/${groupId}` )}
             >
-              Back to Group Details
+              Quay lại chi tiết nhóm
             </Button>
             <Title level={2} style={{ margin: 0 }}>
-              <TeamOutlined /> Edit Group
+              <TeamOutlined /> Chỉnh sửa nhóm
             </Title>
           </Space>
         </Col>
       </Row>
 
+
       <Row gutter={[24, 24]}>
         <Col xs={24} lg={12}>
-          <Card title="Group Information">
+          <Card title="Thông tin nhóm">
             <Form
               form={form}
               layout="vertical"
@@ -241,54 +261,59 @@ const EditGroupPage: React.FC = () => {
             >
               <Form.Item
                 name="name"
-                label="Group Name"
+                label="Tên nhóm"
                 rules={[
-                  { required: true, message: 'Group name is required' },
-                  { min: 2, message: 'Group name must be at least 2 characters' },
-                  { max: 50, message: 'Group name cannot exceed 50 characters' },
+                  { required: true, message: 'Tên nhóm là bắt buộc' },
+                  { min: 2, message: 'Tên nhóm phải có ít nhất 2 ký tự' },
+                  { max: 50, message: 'Tên nhóm không được vượt quá 50 ký tự' },
                 ]}
               >
                 <Input
-                  placeholder="Enter group name"
+                  placeholder="Nhập tên nhóm"
                   size="large"
                 />
               </Form.Item>
 
+
               <Form.Item
                 name="code"
-                label="Group Code"
+                label="Mã nhóm"
                 rules={[{ validator: validateCode }]}
-                extra="Unique identifier for the group (letters, numbers, underscores, and hyphens only)"
+                extra="Định danh duy nhất cho nhóm (chỉ chứa chữ cái, số, dấu gạch dưới và gạch ngang)"
               >
                 <Input
-                  placeholder="Enter group code"
+                  placeholder="Nhập mã nhóm"
                   size="large"
                   disabled // Usually don't allow changing code after creation
                 />
               </Form.Item>
 
+
               <Form.Item
                 name="description"
-                label="Description"
+                label="Mô tả"
               >
                 <TextArea
-                  placeholder="Enter group description (optional)"
+                  placeholder="Nhập mô tả nhóm (tùy chọn)"
                   rows={4}
                 />
               </Form.Item>
 
+
               <Form.Item
                 name="isActive"
-                label="Status"
+                label="Trạng thái"
                 valuePropName="checked"
               >
                 <Switch
-                  checkedChildren="Active"
-                  unCheckedChildren="Inactive"
+                  checkedChildren="Hoạt động"
+                  unCheckedChildren="Không hoạt động"
                 />
               </Form.Item>
 
+
               <Divider />
+
 
               <Form.Item style={{ marginBottom: 0 }}>
                 <Space>
@@ -299,13 +324,13 @@ const EditGroupPage: React.FC = () => {
                     icon={<SaveOutlined />}
                     size="large"
                   >
-                    Update Group
+                    Cập nhật nhóm
                   </Button>
                   <Button
-                    onClick={() => router.push(`/dashboard/groups/${groupId}`)}
+                    onClick={() => router.push(`/dashboard/groups/${groupId}` )}
                     size="large"
                   >
-                    Cancel
+                    Hủy
                   </Button>
                 </Space>
               </Form.Item>
@@ -313,22 +338,23 @@ const EditGroupPage: React.FC = () => {
           </Card>
         </Col>
 
+
         <Col xs={24} lg={12}>
           <Card 
-            title="Assign Permissions" 
+            title="Phân quyền" 
             extra={<SafetyCertificateOutlined />}
             actions={[
               <Button key="select-all" type="link" onClick={handleSelectAll}>
-                Select All
+                Chọn tất cả
               </Button>,
               <Button key="deselect-all" type="link" onClick={handleDeselectAll}>
-                Deselect All
+                Bỏ chọn tất cả
               </Button>,
             ]}
           >
             <div style={{ marginBottom: 16 }}>
               <Text>
-                Selected: <strong>{selectedPermissions.length}</strong> of {permissions.length} permissions
+                Đã chọn: <strong>{selectedPermissions.length}</strong> trong tổng số {permissions.length} quyền hạn
               </Text>
             </div>
             
@@ -346,7 +372,7 @@ const EditGroupPage: React.FC = () => {
             ) : (
               <div style={{ textAlign: 'center', color: '#999', padding: '20px' }}>
                 <SafetyCertificateOutlined style={{ fontSize: '24px', marginBottom: '8px' }} />
-                <div>No permissions available</div>
+                <div>Không có quyền hạn nào</div>
               </div>
             )}
           </Card>
@@ -355,5 +381,6 @@ const EditGroupPage: React.FC = () => {
     </div>
   );
 };
+
 
 export default EditGroupPage;

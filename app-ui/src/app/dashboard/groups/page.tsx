@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Card, Table, Input, App } from 'antd';
+import { Card, Input, App } from 'antd';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { apiClient } from '@/lib/api';
 import { GroupResponse } from '@/types/api';
 import GroupPageHeader from '@/components/groups/GroupPageHeader';
 import GroupBulkActions from '@/components/groups/GroupBulkActions';
-import { useGroupTableColumns } from '@/components/groups/GroupTableColumns';
+import GroupTable from '@/components/groups/GroupTable';
 
 const { Search } = Input;
 
@@ -74,21 +74,8 @@ const GroupsPage: React.FC = () => {
     (group.description && group.description.toLowerCase().includes(searchText.toLowerCase()))
   );
 
-  const columns = useGroupTableColumns({
-    canUpdateGroup,
-    canDeleteGroup,
-    canAssignPermissions,
-    onViewDetails: (groupId: string) => router.push(`/dashboard/groups/${groupId}`),
-    onEditGroup: (groupId: string) => router.push(`/dashboard/groups/${groupId}/edit`),
-    onManagePermissions: (groupId: string) => router.push(`/dashboard/groups/${groupId}/permissions`),
-    onDeleteGroup: handleDelete,
-  });
-
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: (newSelectedRowKeys: React.Key[]) => {
-      setSelectedRowKeys(newSelectedRowKeys);
-    },
+  const handleSelectChange = (newSelectedRowKeys: React.Key[]) => {
+    setSelectedRowKeys(newSelectedRowKeys);
   };
 
   return (
@@ -119,30 +106,18 @@ const GroupsPage: React.FC = () => {
           />
         </div>
 
-        <Table
-          columns={columns}
-          dataSource={filteredGroups}
-          rowKey="id"
-          loading={{
-            spinning: loading,
-            tip: 'Đang tải nhóm...',
-          }}
-          rowSelection={canDeleteGroup ? rowSelection : undefined}
-          pagination={{
-            total: filteredGroups.length,
-            pageSize: 15,
-            showSizeChanger: true,
-            showQuickJumper: true,
-            showTotal: (total, range) =>
-              `${range[0]}-${range[1]} của ${total} nhóm`,
-            pageSizeOptions: ['10', '15', '25', '50'],
-          }}
-          scroll={{
-            x: 800,
-            y: 'calc(100vh - 400px)' // Fixed height with scroll
-          }}
-          size="middle"
-          sticky
+        <GroupTable
+          groups={filteredGroups}
+          loading={loading}
+          selectedRowKeys={selectedRowKeys}
+          onSelectChange={handleSelectChange}
+          canUpdateGroup={canUpdateGroup}
+          canDeleteGroup={canDeleteGroup}
+          canAssignPermissions={canAssignPermissions}
+          onViewDetails={(groupId) => router.push(`/dashboard/groups/${groupId}`)}
+          onEditGroup={(groupId) => router.push(`/dashboard/groups/${groupId}/edit`)}
+          onManagePermissions={(groupId) => router.push(`/dashboard/groups/${groupId}/permissions`)}
+          onDeleteGroup={handleDelete}
         />
       </Card>
     </div>

@@ -56,28 +56,27 @@ const GroupPermissionsPage: React.FC = () => {
       setPageLoading(true);
       const [groupsResponse, permissionsResponse] = await Promise.all([
         apiClient.getGroups(),
-        apiClient.getPermissions()
+        apiClient.getPermissions(),
       ]);
-      
-      const groupDetail = groupsResponse.find(g => g.id === groupId);
+
+      const groupDetail = groupsResponse.find((g) => g.id === groupId);
       if (groupDetail) {
         setGroup(groupDetail);
         setPermissions(permissionsResponse);
-        const currentPermissions = groupDetail.permissions?.map(p => p.code) || [];
+
+        const currentPermissions = groupDetail.permissions?.map((p) => p.code) || [];
         setSelectedPermissions(currentPermissions);
         setOriginalPermissions(currentPermissions);
-        
-        // Expand all parent nodes by default
-        const parentKeys = permissionsResponse
-          .filter(p => !p.parentCode)
-          .map(p => p.code);
+
+        // Mặc định mở rộng các node cha
+        const parentKeys = permissionsResponse.filter((p) => !p.parentCode).map((p) => p.code);
         setExpandedKeys(parentKeys);
       } else {
-        message.error('Group not found');
+        message.error('Không tìm thấy nhóm');
         router.push('/dashboard/groups');
       }
     } catch (error) {
-      message.error('Failed to fetch group details');
+      message.error('Không thể tải chi tiết nhóm');
       console.error('Error fetching group details:', error);
     } finally {
       setPageLoading(false);
@@ -89,9 +88,9 @@ const GroupPermissionsPage: React.FC = () => {
       setLoading(true);
       await apiClient.assignGroupPermissions(groupId, selectedPermissions);
       setOriginalPermissions([...selectedPermissions]);
-      message.success('Permissions updated successfully');
+      message.success('Cập nhật phân quyền thành công');
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 'Failed to update permissions';
+      const errorMessage = error?.response?.data?.message || 'Cập nhật phân quyền thất bại';
       message.error(errorMessage);
       console.error('Error updating permissions:', error);
     } finally {
@@ -102,21 +101,19 @@ const GroupPermissionsPage: React.FC = () => {
   const buildPermissionTree = (): DataNode[] => {
     const permissionMap = new Map<string, PermissionResponse>();
     const rootNodes: DataNode[] = [];
-    
-    // Create a map of all permissions
-    permissions.forEach(permission => {
+
+    permissions.forEach((permission) => {
       permissionMap.set(permission.code, permission);
     });
 
-    // Build tree structure with enhanced UI
-    permissions.forEach(permission => {
+    permissions.forEach((permission) => {
       const isSelected = selectedPermissions.includes(permission.code);
       const wasOriginallySelected = originalPermissions.includes(permission.code);
       const isChanged = isSelected !== wasOriginallySelected;
-      
+
       let statusIcon = null;
       let statusColor = '';
-      
+
       if (isChanged) {
         if (isSelected) {
           statusIcon = <CheckCircleOutlined style={{ color: '#52c41a' }} />;
@@ -135,15 +132,11 @@ const GroupPermissionsPage: React.FC = () => {
               onChange={(e) => handlePermissionToggle(permission.code, e.target.checked)}
             >
               <Space>
-                <span style={{ color: isChanged ? statusColor : undefined }}>
-                  {permission.name}
-                </span>
+                <span style={{ color: isChanged ? statusColor : undefined }}>{permission.name}</span>
                 {statusIcon}
               </Space>
             </Checkbox>
-            <Tag size="small" color={isSelected ? 'blue' : 'default'}>
-              {permission.code}
-            </Tag>
+            <Tag color={isSelected ? 'blue' : 'default'}>{permission.code}</Tag>
             {permission.description && (
               <Tooltip title={permission.description}>
                 <InfoCircleOutlined style={{ color: '#999' }} />
@@ -158,12 +151,10 @@ const GroupPermissionsPage: React.FC = () => {
       if (!permission.parentCode) {
         rootNodes.push(node);
       } else {
-        // Find parent and add as child
         const parent = findNodeByKey(rootNodes, permission.parentCode);
         if (parent && parent.children) {
           parent.children.push(node);
         } else {
-          // If parent not found, add as root
           rootNodes.push(node);
         }
       }
@@ -174,9 +165,7 @@ const GroupPermissionsPage: React.FC = () => {
 
   const findNodeByKey = (nodes: DataNode[], key: string): DataNode | null => {
     for (const node of nodes) {
-      if (node.key === key) {
-        return node;
-      }
+      if (node.key === key) return node;
       if (node.children) {
         const found = findNodeByKey(node.children, key);
         if (found) return found;
@@ -186,46 +175,42 @@ const GroupPermissionsPage: React.FC = () => {
   };
 
   const handlePermissionToggle = (permissionCode: string, checked: boolean) => {
-    const permission = permissions.find(p => p.code === permissionCode);
+    const permission = permissions.find((p) => p.code === permissionCode);
     if (!permission) return;
 
     if (checked) {
-      // Add permission and ensure all parent permissions are also added
+      // Chọn quyền: tự động thêm tất cả quyền cha
       const newPermissions = new Set(selectedPermissions);
       newPermissions.add(permissionCode);
-      
-      // Add all parent permissions
+
       let currentPermission = permission;
       while (currentPermission?.parentCode) {
         newPermissions.add(currentPermission.parentCode);
-        currentPermission = permissions.find(p => p.code === currentPermission?.parentCode);
+        currentPermission = permissions.find((p) => p.code === currentPermission?.parentCode)!;
       }
-      
+
       setSelectedPermissions(Array.from(newPermissions));
     } else {
-      // Remove permission and all child permissions
+      // Bỏ quyền: loại bỏ quyền đó và toàn bộ quyền con
       const permissionsToRemove = new Set([permissionCode]);
-      
-      // Find all child permissions recursively
+
       const findChildren = (parentCode: string) => {
         permissions
-          .filter(p => p.parentCode === parentCode)
-          .forEach(child => {
+          .filter((p) => p.parentCode === parentCode)
+          .forEach((child) => {
             permissionsToRemove.add(child.code);
             findChildren(child.code);
           });
       };
-      
+
       findChildren(permissionCode);
-      
-      setSelectedPermissions(prev => 
-        prev.filter(code => !permissionsToRemove.has(code))
-      );
+
+      setSelectedPermissions((prev) => prev.filter((code) => !permissionsToRemove.has(code)));
     }
   };
 
   const handleSelectAll = () => {
-    setSelectedPermissions(permissions.map(p => p.code));
+    setSelectedPermissions(permissions.map((p) => p.code));
   };
 
   const handleDeselectAll = () => {
@@ -247,39 +232,33 @@ const GroupPermissionsPage: React.FC = () => {
   if (!group) {
     return (
       <div style={{ textAlign: 'center', padding: '50px' }}>
-        <Text>Group not found</Text>
+        <Text>Không tìm thấy nhóm</Text>
       </div>
     );
   }
 
   const permissionTree = buildPermissionTree();
-  const hasChanges = JSON.stringify(selectedPermissions.sort()) !== JSON.stringify(originalPermissions.sort());
-  const addedCount = selectedPermissions.filter(p => !originalPermissions.includes(p)).length;
-  const removedCount = originalPermissions.filter(p => !selectedPermissions.includes(p)).length;
+  const hasChanges =
+    JSON.stringify([...selectedPermissions].sort()) !== JSON.stringify([...originalPermissions].sort());
+  const addedCount = selectedPermissions.filter((p) => !originalPermissions.includes(p)).length;
+  const removedCount = originalPermissions.filter((p) => !selectedPermissions.includes(p)).length;
 
   return (
     <div>
       <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
         <Col>
           <Space>
-            <Button
-              icon={<ArrowLeftOutlined />}
-              onClick={() => router.push(`/dashboard/groups/${groupId}`)}
-            >
-              Back to Group Details
+            <Button icon={<ArrowLeftOutlined />} onClick={() => router.push(`/dashboard/groups/${groupId}`)}>
+              Quay lại chi tiết nhóm
             </Button>
             <Title level={2} style={{ margin: 0 }}>
-              <SafetyCertificateOutlined /> Manage Permissions
+              <SafetyCertificateOutlined /> Quản lý phân quyền
             </Title>
           </Space>
         </Col>
         <Col>
           <Space>
-            {hasChanges && (
-              <Button onClick={handleReset}>
-                Reset Changes
-              </Button>
-            )}
+            {hasChanges && <Button onClick={handleReset}>Đặt lại thay đổi</Button>}
             <Button
               type="primary"
               icon={<SaveOutlined />}
@@ -287,7 +266,7 @@ const GroupPermissionsPage: React.FC = () => {
               loading={loading}
               disabled={!hasChanges}
             >
-              Save Changes
+              Lưu thay đổi
             </Button>
           </Space>
         </Col>
@@ -295,30 +274,28 @@ const GroupPermissionsPage: React.FC = () => {
 
       <Row gutter={[24, 24]}>
         <Col xs={24}>
-          <Card 
+          <Card
             title={
               <Space>
                 <TeamOutlined />
-                <span>Group: {group.name}</span>
+                <span>Nhóm: {group.name}</span>
                 <Tag color="blue">{group.code}</Tag>
               </Space>
             }
           >
-            {group.description && (
-              <Text type="secondary">{group.description}</Text>
-            )}
+            {group.description && <Text type="secondary">{group.description}</Text>}
           </Card>
         </Col>
 
         <Col xs={24}>
           {hasChanges && (
             <Alert
-              message="Unsaved Changes"
+              message="Có thay đổi chưa lưu"
               description={
                 <Space>
-                  {addedCount > 0 && <Tag color="green">+{addedCount} added</Tag>}
-                  {removedCount > 0 && <Tag color="red">-{removedCount} removed</Tag>}
-                  <span>Click "Save Changes" to apply these modifications.</span>
+                  {addedCount > 0 && <Tag color="green">+{addedCount} đã thêm</Tag>}
+                  {removedCount > 0 && <Tag color="red">-{removedCount} đã gỡ</Tag>}
+                  <span>Nhấn “Lưu thay đổi” để áp dụng các chỉnh sửa này.</span>
                 </Space>
               }
               type="warning"
@@ -326,40 +303,40 @@ const GroupPermissionsPage: React.FC = () => {
               style={{ marginBottom: 16 }}
             />
           )}
-          
-          <Card 
-            title="Permission Assignment" 
+
+          <Card
+            title="Gán quyền"
             extra={<SafetyCertificateOutlined />}
             actions={[
               <Button key="select-all" type="link" onClick={handleSelectAll}>
-                Select All ({permissions.length})
+                Chọn tất cả ({permissions.length})
               </Button>,
               <Button key="deselect-all" type="link" onClick={handleDeselectAll}>
-                Deselect All
+                Bỏ chọn
               </Button>,
             ]}
           >
             <div style={{ marginBottom: 16 }}>
               <Space split={<Divider type="vertical" />}>
                 <Text>
-                  Selected: <strong>{selectedPermissions.length}</strong> of {permissions.length}
+                  Đang chọn: <strong>{selectedPermissions.length}</strong>/<>{permissions.length}</>
                 </Text>
                 {hasChanges && (
                   <Text type="warning">
-                    <ExclamationCircleOutlined /> {addedCount + removedCount} changes pending
+                    <ExclamationCircleOutlined /> {addedCount + removedCount} thay đổi đang chờ
                   </Text>
                 )}
               </Space>
             </div>
-            
+
             <Alert
-              message="Permission Hierarchy Rules"
-              description="Selecting a parent permission automatically includes all child permissions. Removing a parent permission removes all child permissions. This ensures proper access control hierarchy."
+              message="Quy tắc phân cấp quyền"
+              description="Chọn quyền cha sẽ tự động bao gồm toàn bộ quyền con. Bỏ quyền cha sẽ loại bỏ toàn bộ quyền con, đảm bảo đúng phân cấp kiểm soát truy cập."
               type="info"
               showIcon
               style={{ marginBottom: 16 }}
             />
-            
+
             {permissionTree.length > 0 ? (
               <Tree
                 treeData={permissionTree}
@@ -369,12 +346,12 @@ const GroupPermissionsPage: React.FC = () => {
                 showIcon={false}
                 selectable={false}
                 height={500}
-                style={{ overflow: 'auto', border: '1px solid #f0f0f0', borderRadius: '6px', padding: '12px' }}
+                style={{ overflow: 'auto', border: '1px solid #f0f0f0', borderRadius: 6, padding: 12 }}
               />
             ) : (
-              <div style={{ textAlign: 'center', color: '#999', padding: '40px' }}>
-                <SafetyCertificateOutlined style={{ fontSize: '48px', marginBottom: '16px' }} />
-                <div>No permissions available</div>
+              <div style={{ textAlign: 'center', color: '#999', padding: 40 }}>
+                <SafetyCertificateOutlined style={{ fontSize: 48, marginBottom: 16 }} />
+                <div>Chưa có quyền nào</div>
               </div>
             )}
           </Card>

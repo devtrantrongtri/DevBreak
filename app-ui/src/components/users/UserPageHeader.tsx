@@ -19,7 +19,7 @@ interface UserPageHeaderProps {
   onCreate: () => void;
 }
 
-const UserPageHeader: React.FC<UserPageHeaderProps> = ({
+const   UserPageHeader: React.FC<UserPageHeaderProps> = ({
   loading,
   exportLoading,
   canCreateUser,
@@ -29,15 +29,15 @@ const UserPageHeader: React.FC<UserPageHeaderProps> = ({
   onCreate,
 }) => {
   return (
-    <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
+    <Row justify="space-between" align="middle" style={{ marginBottom: 5 }}>
       <Col>
         <Title level={3} style={{ margin: 0, fontWeight: 500 }}>
           <UserOutlined style={{ marginRight: 8, color: '#1890ff' }} />
           Quản lý người dùng
         </Title>
-        <Text type="secondary" style={{ fontSize: '13px' }}>
+        {/* <Text type="secondary" style={{ fontSize: '13px' }}>
           Quản lý tài khoản người dùng và phân quyền
-        </Text>
+        </Text> */}
       </Col>
       <Col>
         <Space size="small">

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Table, Modal, App, Card, Row, Col } from 'antd';
+import { Modal, App, Card, Row, Col } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
@@ -11,7 +11,7 @@ import UserImportModal from '@/components/users/UserImportModal';
 import AdvancedSearch, { SearchFilters } from '@/components/users/AdvancedSearch';
 import UserPageHeader from '@/components/users/UserPageHeader';
 import UserBulkActions from '@/components/users/UserBulkActions';
-import { useUserTableColumns } from '@/components/users/UserTableColumns';
+import UserTable from '@/components/users/UserTable';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 
@@ -206,25 +206,12 @@ const UsersPage: React.FC = () => {
     return true;
   });
 
-  const columns = useUserTableColumns({
-    canUpdateUser,
-    canDeleteUser,
-    onViewProfile: (userId) => router.push(`/dashboard/users/${userId}/profile`),
-    onViewDetails: (userId) => router.push(`/dashboard/users/${userId}`),
-    onEditUser: (userId) => router.push(`/dashboard/users/${userId}/edit`),
-    onDeleteUser: handleDelete,
-    onStatusToggle: handleStatusToggle,
-  });
-
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: (newSelectedRowKeys: React.Key[]) => {
-      setSelectedRowKeys(newSelectedRowKeys);
-    },
+  const handleSelectChange = (newSelectedRowKeys: React.Key[]) => {
+    setSelectedRowKeys(newSelectedRowKeys);
   };
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div style={{ padding: '0 0' }}>
       <style jsx>{`
         .custom-users-table :global(.ant-table-thead > tr > th) {
           background-color: #fafafa !important;
@@ -242,7 +229,7 @@ const UsersPage: React.FC = () => {
         onImport={() => setImportModalVisible(true)}
         onCreate={() => router.push('/dashboard/users/create')}
       />
-
+{/* 
       <Card
         style={{
           borderRadius: 6,
@@ -250,7 +237,7 @@ const UsersPage: React.FC = () => {
           minHeight: 'calc(100vh - 280px)'
         }}
         styles={{ body: { padding: '16px' } }}
-      >
+      > */}
         <AdvancedSearch
           groups={groups}
           onSearch={setSearchFilters}
@@ -258,7 +245,7 @@ const UsersPage: React.FC = () => {
           loading={loading}
         />
 
-        <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
+        <Row gutter={[16, 16]} style={{ marginBottom: 0 }}>
           <Col xs={24} md={6}>
             <UserBulkActions
               totalUsers={filteredUsers.length}
@@ -271,33 +258,20 @@ const UsersPage: React.FC = () => {
           </Col>
         </Row>
 
-        <Table
-          columns={columns}
-          dataSource={filteredUsers}
-          rowKey="id"
-          loading={{
-            spinning: loading,
-            tip: 'Đang tải danh sách người dùng...',
-          }}
-          rowSelection={canDeleteUser ? rowSelection : undefined}
-          pagination={{
-            total: filteredUsers.length,
-            pageSize: 15,
-            showSizeChanger: true,
-            showQuickJumper: true,
-            showTotal: (total, range) =>
-              `${range[0]}-${range[1]} trong ${total} người dùng`,
-            pageSizeOptions: ['10', '15', '25', '50'],
-          }}
-          scroll={{
-            x: 800,
-            y: 'calc(100vh - 400px)'
-          }}
-          size="small"
-          sticky
-          className="custom-users-table"
+        <UserTable
+          users={filteredUsers}
+          loading={loading}
+          selectedRowKeys={selectedRowKeys}
+          onSelectChange={handleSelectChange}
+          canUpdateUser={canUpdateUser}
+          canDeleteUser={canDeleteUser}
+          onViewProfile={(userId) => router.push(`/dashboard/users/${userId}/profile`)}
+          onViewDetails={(userId) => router.push(`/dashboard/users/${userId}`)}
+          onEditUser={(userId) => router.push(`/dashboard/users/${userId}/edit`)}
+          onDeleteUser={handleDelete}
+          onStatusToggle={handleStatusToggle}
         />
-      </Card>
+      {/* </Card> */}
 
       <UserImportModal
         visible={importModalVisible}

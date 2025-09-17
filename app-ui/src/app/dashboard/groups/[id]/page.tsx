@@ -61,7 +61,7 @@ const GroupDetailsPage: React.FC = () => {
         router.push('/dashboard/groups');
       }
     } catch (error) {
-      console.error('Error fetching group details:', error);
+      console.error('Lỗi khi lấy thông tin nhóm:', error);
     } finally {
       setLoading(false);
     }
@@ -131,7 +131,7 @@ const GroupDetailsPage: React.FC = () => {
   if (!group) {
     return (
       <div style={{ textAlign: 'center', padding: '50px' }}>
-        <Text>Group not found</Text>
+        <Text>Không tìm thấy nhóm</Text>
       </div>
     );
   }
@@ -147,10 +147,10 @@ const GroupDetailsPage: React.FC = () => {
               icon={<ArrowLeftOutlined />}
               onClick={() => router.push('/dashboard/groups')}
             >
-              Back to Groups
+              Quay lại Danh sách
             </Button>
             <Title level={2} style={{ margin: 0 }}>
-              <TeamOutlined /> Group Details
+              <TeamOutlined /> Chi tiết nhóm
             </Title>
           </Space>
         </Col>
@@ -161,7 +161,7 @@ const GroupDetailsPage: React.FC = () => {
                 icon={<SafetyCertificateOutlined />}
                 onClick={() => router.push(`/dashboard/groups/${groupId}/permissions`)}
               >
-                Manage Permissions
+                Quản lý quyền hạn
               </Button>
             )}
             {canUpdateGroup && (
@@ -170,7 +170,7 @@ const GroupDetailsPage: React.FC = () => {
                 icon={<EditOutlined />}
                 onClick={() => router.push(`/dashboard/groups/${groupId}/edit`)}
               >
-                Edit Group
+                Chỉnh sửa nhóm
               </Button>
             )}
           </Space>
@@ -179,36 +179,36 @@ const GroupDetailsPage: React.FC = () => {
 
       <Row gutter={[24, 24]}>
         <Col xs={24} lg={12}>
-          <Card title="Group Information" extra={<TeamOutlined />}>
+          <Card title="Thông tin nhóm" extra={<TeamOutlined />}>
             <Descriptions column={1} bordered>
-              <Descriptions.Item label="Name">
+              <Descriptions.Item label="Tên nhóm">
                 {group.name}
               </Descriptions.Item>
-              <Descriptions.Item label="Code">
+              <Descriptions.Item label="Mã nhóm">
                 <Tag color="blue">{group.code}</Tag>
               </Descriptions.Item>
-              <Descriptions.Item label="Description">
-                {group.description || <Text type="secondary">No description</Text>}
+              <Descriptions.Item label="Mô tả">
+                {group.description || <Text type="secondary">Không có mô tả</Text>}
               </Descriptions.Item>
-              <Descriptions.Item label="Status">
+              <Descriptions.Item label="Trạng thái">
                 <Tag color={group.isActive ? 'green' : 'red'}>
-                  {group.isActive ? 'Active' : 'Inactive'}
+                  {group.isActive ? 'Đang hoạt động' : 'Không hoạt động'}
                 </Tag>
               </Descriptions.Item>
-              <Descriptions.Item label="Members">
+              <Descriptions.Item label="Thành viên">
                 <Badge count={group.users?.length || 0} showZero>
-                  <UserOutlined /> Users
+                  <UserOutlined /> Người dùng
                 </Badge>
               </Descriptions.Item>
-              <Descriptions.Item label="Permissions">
+              <Descriptions.Item label="Quyền hạn">
                 <Badge count={group.permissions?.length || 0} showZero>
-                  <SafetyCertificateOutlined /> Permissions
+                  <SafetyCertificateOutlined /> Quyền hạn
                 </Badge>
               </Descriptions.Item>
-              <Descriptions.Item label="Created">
+              <Descriptions.Item label="Ngày tạo">
                 {new Date(group.createdAt).toLocaleString()}
               </Descriptions.Item>
-              <Descriptions.Item label="Last Updated">
+              <Descriptions.Item label="Cập nhật lần cuối">
                 {new Date(group.updatedAt).toLocaleString()}
               </Descriptions.Item>
             </Descriptions>
@@ -217,7 +217,7 @@ const GroupDetailsPage: React.FC = () => {
 
         <Col xs={24} lg={12}>
           <Card 
-            title="Group Members" 
+            title="Thành viên nhóm" 
             extra={<UserOutlined />}
             actions={canUpdateGroup ? [
               <Button
@@ -226,7 +226,7 @@ const GroupDetailsPage: React.FC = () => {
                 icon={<SettingOutlined />}
                 onClick={() => router.push(`/dashboard/groups/${groupId}/members`)}
               >
-                Manage Members
+                Quản lý thành viên
               </Button>
             ] : undefined}
           >
@@ -241,7 +241,7 @@ const GroupDetailsPage: React.FC = () => {
                       description={user.email}
                     />
                     <Tag color={user.isActive ? 'green' : 'red'}>
-                      {user.isActive ? 'Active' : 'Inactive'}
+                      {user.isActive ? 'Đang hoạt động' : 'Không hoạt động'}
                     </Tag>
                   </List.Item>
                 )}
@@ -249,7 +249,7 @@ const GroupDetailsPage: React.FC = () => {
             ) : (
               <div style={{ textAlign: 'center', color: '#999', padding: '20px' }}>
                 <UserOutlined style={{ fontSize: '24px', marginBottom: '8px' }} />
-                <div>No members in this group</div>
+                <div>Không có thành viên nào trong nhóm này</div>
               </div>
             )}
           </Card>
@@ -257,7 +257,7 @@ const GroupDetailsPage: React.FC = () => {
 
         <Col xs={24}>
           <Card 
-            title="Assigned Permissions" 
+            title="Quyền hạn được gán" 
             extra={<SafetyCertificateOutlined />}
             actions={canAssignPermissions ? [
               <Button
@@ -266,7 +266,7 @@ const GroupDetailsPage: React.FC = () => {
                 icon={<SettingOutlined />}
                 onClick={() => router.push(`/dashboard/groups/${groupId}/permissions`)}
               >
-                Manage Permissions
+                Quản lý quyền hạn
               </Button>
             ] : undefined}
           >
@@ -281,7 +281,7 @@ const GroupDetailsPage: React.FC = () => {
             ) : (
               <div style={{ textAlign: 'center', color: '#999', padding: '20px' }}>
                 <SafetyCertificateOutlined style={{ fontSize: '24px', marginBottom: '8px' }} />
-                <div>No permissions assigned to this group</div>
+                <div>Chưa gán quyền hạn nào cho nhóm này</div>
               </div>
             )}
           </Card>

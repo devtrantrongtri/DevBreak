@@ -106,7 +106,7 @@ export const useUserTableColumns = ({
                 type="text"
                 onClick={() => onStatusToggle(record.id, record.isActive)}
               >
-                {record.isActive ? 'Vô hiệu hóa' : 'Kích hoạt'}
+                {record.isActive ? 'X' : 'Y'}
               </Button>
             </Tooltip>
           )}
