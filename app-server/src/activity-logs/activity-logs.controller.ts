@@ -30,11 +30,23 @@ export class ActivityLogsController {
   }
 
   @Get()
-  @RequirePermissions('audit.read')
+  @RequirePermissions('audit.view')
   @ApiOperation({ summary: 'Get all activity logs with filtering and pagination' })
   @ApiResponse({ status: 200, description: 'Activity logs retrieved successfully.', type: PaginatedActivityLogsDto })
-  async findAll(@Query() query: GetActivityLogsDto): Promise<PaginatedActivityLogsDto> {
-    return this.activityLogsService.findAll(query);
+  async findAll(
+    @Query() query: GetActivityLogsDto,
+    @Request() req: any
+  ): Promise<PaginatedActivityLogsDto> {
+    // Check if user has permission to view all logs
+    const canViewAll = req.user.effectivePermissions?.includes('audit.manage');
+
+    if (canViewAll) {
+      // Admin can see all logs
+      return this.activityLogsService.findAll(query);
+    } else {
+      // Regular user can only see their own logs
+      return this.activityLogsService.findAll({ ...query, userId: req.user.userId });
+    }
   }
 
   @Get('recent')
@@ -48,13 +60,22 @@ export class ActivityLogsController {
   }
 
   @Get('user/:userId')
-  @RequirePermissions('user.read', 'audit.read')
+  @RequirePermissions('audit.view')
   @ApiOperation({ summary: 'Get activity logs for a specific user' })
   @ApiResponse({ status: 200, description: 'User activity logs retrieved successfully.', type: PaginatedActivityLogsDto })
   async getUserActivityLogs(
     @Param('userId', ParseUUIDPipe) userId: string,
-    @Query() query: GetActivityLogsDto
+    @Query() query: GetActivityLogsDto,
+    @Request() req: any
   ): Promise<PaginatedActivityLogsDto> {
+    // Check if user has permission to view all logs or is viewing their own
+    const canViewAll = req.user.effectivePermissions?.includes('audit.manage');
+    const isOwnLogs = userId === req.user.userId;
+
+    if (!canViewAll && !isOwnLogs) {
+      throw new Error('You can only view your own activity logs');
+    }
+
     return this.activityLogsService.findByUserId(userId, query);
   }
 

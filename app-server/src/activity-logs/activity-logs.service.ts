@@ -86,7 +86,7 @@ export class ActivityLogsService {
     method?: string,
     path?: string,
     status: string = 'success'
-  ): Promise<void> {
+  ): Promise<ActivityLog | null> {
     try {
       const createDto: CreateActivityLogDto = {
         action: action as any,
@@ -100,12 +100,16 @@ export class ActivityLogsService {
         status: status as any,
       };
 
-      await this.create(createDto, userId);
+      const activityLog = await this.create(createDto, userId);
+      return activityLog;
     } catch (error) {
       // Log error but don't throw to avoid breaking the main operation
       console.error('Failed to log activity:', error);
+      return null;
     }
   }
+
+
 
   private createQueryBuilder(filters: Partial<GetActivityLogsDto>): SelectQueryBuilder<ActivityLog> {
     const queryBuilder = this.activityLogRepository

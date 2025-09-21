@@ -5,6 +5,7 @@ import { Modal, Form, Input, Select, Switch, InputNumber, message, App, Space, A
 import { MenuResponse, PermissionResponse } from '@/types/api';
 import { apiClient } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
+import IconSelector from '@/components/common/IconSelector';
 import {
   MenuOutlined,
   LinkOutlined,
@@ -139,12 +140,14 @@ const AddMenuModal: React.FC<AddMenuModalProps> = ({
       onCancel={handleCancel}
       footer={null}
       width={600}
-      destroyOnClose
       style={{ top: 20 }}
-      bodyStyle={{ 
-        maxHeight: 'calc(100vh - 200px)', 
-        overflowY: 'auto',
-        padding: '24px'
+      styles={{
+        body: {
+          maxHeight: 'calc(100vh - 200px)',
+          overflowY: 'auto',
+          padding: '24px'
+        },
+        header: { padding: '16px 24px', borderBottom: '1px solid #f0f0f0' }
       }}
     >
       <Alert
@@ -205,71 +208,9 @@ const AddMenuModal: React.FC<AddMenuModalProps> = ({
             </Space>
           }
           name="icon"
-          extra="Chọn icon từ danh sách hoặc nhập tên icon Ant Design"
+          extra="Chọn icon từ danh sách có sẵn"
         >
-          <Select
-            placeholder="Chọn icon hoặc nhập tên icon"
-            allowClear
-            showSearch
-            filterOption={(input, option) =>
-              (option?.label as string)?.toLowerCase().includes(input.toLowerCase())
-            }
-            options={[
-              { value: 'DashboardOutlined', label: '📊 DashboardOutlined - Bảng điều khiển' },
-              { value: 'UserOutlined', label: '👤 UserOutlined - Người dùng' },
-              { value: 'TeamOutlined', label: '👥 TeamOutlined - Nhóm' },
-              { value: 'MenuOutlined', label: '📝 MenuOutlined - Menu' },
-              { value: 'SettingOutlined', label: '⚙️ SettingOutlined - Cài đặt' },
-              { value: 'FileOutlined', label: '📄 FileOutlined - Tài liệu' },
-              { value: 'FolderOutlined', label: '📁 FolderOutlined - Thư mục' },
-              { value: 'HomeOutlined', label: '🏠 HomeOutlined - Trang chủ' },
-              { value: 'AppstoreOutlined', label: '⚡ AppstoreOutlined - Ứng dụng' },
-              { value: 'BankOutlined', label: '🏦 BankOutlined - Ngân hàng' },
-              { value: 'ShopOutlined', label: '🏪 ShopOutlined - Cửa hàng' },
-              { value: 'GlobalOutlined', label: '🌐 GlobalOutlined - Toàn cầu' },
-              { value: 'SafetyCertificateOutlined', label: '🛡️ SafetyCertificateOutlined - Bảo mật' },
-              { value: 'AuditOutlined', label: '📋 AuditOutlined - Kiểm tra' },
-              { value: 'DatabaseOutlined', label: '💾 DatabaseOutlined - Cơ sở dữ liệu' },
-              { value: 'CloudOutlined', label: '☁️ CloudOutlined - Đám mây' },
-              { value: 'ApiOutlined', label: '🔗 ApiOutlined - API' },
-              { value: 'CodeOutlined', label: '💻 CodeOutlined - Mã nguồn' },
-              { value: 'BugOutlined', label: '🐛 BugOutlined - Lỗi' },
-              { value: 'ExperimentOutlined', label: '🧪 ExperimentOutlined - Thử nghiệm' },
-              { value: 'RocketOutlined', label: '🚀 RocketOutlined - Khởi chạy' },
-              { value: 'TrophyOutlined', label: '🏆 TrophyOutlined - Thành tích' },
-              { value: 'GiftOutlined', label: '🎁 GiftOutlined - Quà tặng' },
-              { value: 'HeartOutlined', label: '❤️ HeartOutlined - Yêu thích' },
-              { value: 'StarOutlined', label: '⭐ StarOutlined - Ngôi sao' },
-              { value: 'BellOutlined', label: '🔔 BellOutlined - Thông báo' },
-              { value: 'MessageOutlined', label: '💬 MessageOutlined - Tin nhắn' },
-              { value: 'MailOutlined', label: '📧 MailOutlined - Email' },
-              { value: 'PhoneOutlined', label: '📞 PhoneOutlined - Điện thoại' },
-              { value: 'CalendarOutlined', label: '📅 CalendarOutlined - Lịch' },
-              { value: 'ClockCircleOutlined', label: '⏰ ClockCircleOutlined - Thời gian' },
-              { value: 'EnvironmentOutlined', label: '📍 EnvironmentOutlined - Vị trí' },
-              { value: 'CarOutlined', label: '🚗 CarOutlined - Xe hơi' },
-              { value: 'CameraOutlined', label: '📷 CameraOutlined - Máy ảnh' },
-              { value: 'PictureOutlined', label: '🖼️ PictureOutlined - Hình ảnh' },
-              { value: 'VideoCameraOutlined', label: '📹 VideoCameraOutlined - Video' },
-              { value: 'SoundOutlined', label: '🔊 SoundOutlined - Âm thanh' },
-              { value: 'BookOutlined', label: '📚 BookOutlined - Sách' },
-              { value: 'ReadOutlined', label: '📖 ReadOutlined - Đọc' },
-              { value: 'EditOutlined', label: '✏️ EditOutlined - Chỉnh sửa' },
-              { value: 'CopyOutlined', label: '📄 CopyOutlined - Sao chép' },
-              { value: 'DeleteOutlined', label: '🗑️ DeleteOutlined - Xóa' },
-              { value: 'SaveOutlined', label: '💾 SaveOutlined - Lưu' },
-              { value: 'DownloadOutlined', label: '⬇️ DownloadOutlined - Tải xuống' },
-              { value: 'UploadOutlined', label: '⬆️ UploadOutlined - Tải lên' },
-              { value: 'PrinterOutlined', label: '🖨️ PrinterOutlined - In' },
-              { value: 'ScanOutlined', label: '📱 ScanOutlined - Quét' },
-              { value: 'QrcodeOutlined', label: '📱 QrcodeOutlined - QR Code' },
-              { value: 'LockOutlined', label: '🔒 LockOutlined - Khóa' },
-              { value: 'UnlockOutlined', label: '🔓 UnlockOutlined - Mở khóa' },
-              { value: 'EyeOutlined', label: '👁️ EyeOutlined - Xem' },
-              { value: 'EyeInvisibleOutlined', label: '🙈 EyeInvisibleOutlined - Ẩn' },
-            ]}
-            style={{ fontSize: '14px' }}
-          />
+          <IconSelector placeholder="Chọn icon cho menu" />
         </Form.Item>
 
         <Form.Item
@@ -336,14 +277,7 @@ const AddMenuModal: React.FC<AddMenuModalProps> = ({
           />
         </Form.Item>
 
-        <Form.Item
-          name="icon"
-          label="Icon (tùy chọn)"
-        >
-          <Input 
-            placeholder="Tên icon Ant Design (ví dụ: UserOutlined, SettingOutlined)" 
-          />
-        </Form.Item>
+
 
         <Form.Item
           name="description"

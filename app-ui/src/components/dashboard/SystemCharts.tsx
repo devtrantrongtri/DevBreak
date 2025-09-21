@@ -213,7 +213,7 @@ const SystemCharts: React.FC<SystemChartsProps> = ({ onViewUsers, onViewGroups }
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  label={(entry: any) => `${entry.name} ${(entry.percent * 100).toFixed(0)}%`}
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
@@ -305,7 +305,7 @@ const SystemCharts: React.FC<SystemChartsProps> = ({ onViewUsers, onViewGroups }
       </Row>
 
       {/* Recent Activities */}
-      <Row gutter={[16, 16]}>
+      {/* <Row gutter={[16, 16]}>
         <Col xs={24} lg={16}>
           <Card 
             title={
@@ -362,7 +362,7 @@ const SystemCharts: React.FC<SystemChartsProps> = ({ onViewUsers, onViewGroups }
             </Space>
           </Card>
         </Col>
-      </Row>
+      </Row> */}
     </div>
   );
 };

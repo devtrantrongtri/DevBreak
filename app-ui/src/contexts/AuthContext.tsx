@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
 import { User, MenuItem } from '@/types/auth';
 import { apiClient } from '@/lib/api';
-import { message } from 'antd';
+import { message, App } from 'antd';
 
 interface AuthContextType {
   user: User | null;
@@ -14,6 +14,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   refreshUserData: () => Promise<void>;
+  getToken: () => string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -35,6 +36,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [permissions, setPermissions] = useState<string[]>([]);
   const [menuTree, setMenuTree] = useState<MenuItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { message: messageApi } = App.useApp();
 
   const isAuthenticated = !!user;
 
@@ -64,7 +66,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
     setPermissions([]);
     setMenuTree([]);
-    message.info('Logged out successfully');
+    messageApi.info('Đăng xuất thành công');
+  };
+
+  const getToken = (): string | null => {
+    return typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
   };
 
   const refreshUserData = useCallback(async () => {
@@ -109,6 +115,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     logout,
     refreshUserData,
+    getToken,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

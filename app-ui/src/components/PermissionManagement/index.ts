@@ -4,3 +4,6 @@ export { default as DeletePermissionModal } from './DeletePermissionModal';
 export { default as PermissionTable } from './PermissionTable';
 export { default as PermissionHeader } from './PermissionHeader';
 export { default as PermissionSearch } from './PermissionSearch';
+export { default as PermissionTreeView } from './PermissionTreeView';
+export { default as EditablePermissionName } from './EditablePermissionName';
+export { default as PermissionSyncStatus } from './PermissionSyncStatus';

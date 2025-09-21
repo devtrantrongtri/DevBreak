@@ -12,6 +12,7 @@ import {
   MenuResponse,
   SeedResponse,
 } from '@/types/api';
+import { PaginatedActivityLogs } from '@/types/activity-logs';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
@@ -188,6 +189,21 @@ class ApiClient {
     });
   }
 
+  async updateMenu(id: string, menuData: {
+    name: string;
+    path: string;
+    icon?: string;
+    description?: string;
+    permissionCode: string;
+    order: number;
+    isActive: boolean;
+  }): Promise<MenuResponse> {
+    return this.request<MenuResponse>(`/menus/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(menuData),
+    });
+  }
+
   async createMenu(menuData: {
     name: string;
     path: string;
@@ -265,13 +281,15 @@ class ApiClient {
     userId?: string;
     action?: string;
     resource?: string;
+    status?: string;
+    search?: string;
     startDate?: string;
     endDate?: string;
-  }): Promise<any> {
+  }): Promise<PaginatedActivityLogs> {
     const queryParams = new URLSearchParams();
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined) {
+        if (value !== undefined && value !== null && value !== '') {
           queryParams.append(key, value.toString());
         }
       });

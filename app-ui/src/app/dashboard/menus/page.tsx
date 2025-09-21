@@ -27,7 +27,6 @@ import {
   MenuTree,
   MenuTable,
   EditMenuModal,
-  RebindPermissionModal,
   AddMenuModal,
   DeleteMenuModal,
 } from '@/components/MenuManagement';
@@ -44,12 +43,12 @@ const MenusPage: React.FC = () => {
   const [viewMode, setViewMode] = useState<'table' | 'tree'>('table');
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const [editModalVisible, setEditModalVisible] = useState(false);
-  const [rebindModalVisible, setRebindModalVisible] = useState(false);
+
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState<MenuResponse | null>(null);
   const [updateLoading, setUpdateLoading] = useState(false);
-  const { permissions: userPermissions } = useAuth();
+  const { permissions: userPermissions, refreshUserData } = useAuth();
 
   const canUpdateMenuName = userPermissions.includes('menu.updateName');
   const canRebindPermission = userPermissions.includes('menu.rebindPermission');
@@ -82,20 +81,20 @@ const MenusPage: React.FC = () => {
     setEditModalVisible(true);
   };
 
-  const openRebindModal = (menu: MenuResponse) => {
-    setSelectedMenu(menu);
-    setRebindModalVisible(true);
-  };
+
 
   const handleUpdateName = async (values: { name: string }) => {
     if (!selectedMenu) return;
-    
+
     setUpdateLoading(true);
     try {
       await apiClient.updateMenuName(selectedMenu.id, values.name);
       message.success('Cập nhật tên menu thành công');
       setEditModalVisible(false);
       fetchMenus();
+
+      // Refresh user data to update sidebar menu
+      await refreshUserData();
     } catch (error: any) {
       console.error('Update menu name error:', error);
       message.error(error.message || 'Cập nhật tên menu thất bại');
@@ -104,22 +103,36 @@ const MenusPage: React.FC = () => {
     }
   };
 
-  const handleRebindPermission = async (values: { permissionCode: string }) => {
+  const handleUpdateMenu = async (values: {
+    name: string;
+    path: string;
+    icon?: string;
+    description?: string;
+    permissionCode: string;
+    order: number;
+    isActive: boolean;
+  }) => {
     if (!selectedMenu) return;
 
+    setUpdateLoading(true);
     try {
-      setUpdateLoading(true);
-      await apiClient.rebindMenuPermission(selectedMenu.id, values.permissionCode);
-      message.success('Cập nhật quyền menu thành công');
-      setRebindModalVisible(false);
+      // Call API to update full menu (you may need to implement this endpoint)
+      await apiClient.updateMenu(selectedMenu.id, values);
+      message.success('Cập nhật menu thành công');
+      setEditModalVisible(false);
       fetchMenus();
-    } catch (error) {
-      message.error('Không thể cập nhật quyền menu');
-      console.error('Error rebinding permission:', error);
+
+      // Refresh user data to update sidebar menu icons
+      await refreshUserData();
+    } catch (error: any) {
+      console.error('Update menu error:', error);
+      message.error(error.message || 'Cập nhật menu thất bại');
     } finally {
       setUpdateLoading(false);
     }
   };
+
+
 
   const handleDeleteMenu = (menu: MenuResponse) => {
     setSelectedMenu(menu);
@@ -348,9 +361,7 @@ const MenusPage: React.FC = () => {
               canDeleteMenu={canDeleteMenu}
               onDeleteMenu={handleDeleteMenu}
               canUpdateMenuName={canUpdateMenuName}
-              canRebindPermission={canRebindPermission}
               onEditMenu={openEditModal}
-              onRebindPermission={openRebindModal}
             />
           </div>
         ) : (
@@ -369,10 +380,8 @@ const MenusPage: React.FC = () => {
               permissions={permissions}
               loading={false}
               canUpdateMenuName={canUpdateMenuName}
-              canRebindPermission={canRebindPermission}
               canDeleteMenu={canDeleteMenu}
               onEditMenu={openEditModal}
-              onRebindPermission={openRebindModal}
               onDeleteMenu={handleDeleteMenu}
             />
           </div>
@@ -384,18 +393,12 @@ const MenusPage: React.FC = () => {
         visible={editModalVisible}
         loading={updateLoading}
         selectedMenu={selectedMenu}
+        permissions={permissions}
         onCancel={() => setEditModalVisible(false)}
-        onSubmit={handleUpdateName}
+        onSubmit={handleUpdateMenu}
       />
 
-      <RebindPermissionModal
-        visible={rebindModalVisible}
-        loading={updateLoading}
-        selectedMenu={selectedMenu}
-        permissions={permissions}
-        onCancel={() => setRebindModalVisible(false)}
-        onSubmit={handleRebindPermission}
-      />
+
 
       <AddMenuModal
         visible={addModalVisible}

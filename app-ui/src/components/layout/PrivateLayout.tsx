@@ -21,21 +21,7 @@ const { Header, Sider, Content } = Layout;
 
 type AntdMenuItem = Required<MenuProps>['items'][number];
 
-const getIconByName = (iconName?: string) => {
-  const iconMap: Record<string, React.ReactNode> = {
-    'DashboardOutlined': <DashboardOutlined />,
-    'SettingOutlined': <SettingOutlined />,
-    'UserOutlined': <UserOutlined />,
-    'TeamOutlined': <TeamOutlined />,
-    'MenuOutlined': <MenuFoldOutlined />,
-    'FileOutlined': <FileOutlined />,
-    // Add more icons for better UI
-    'SafetyCertificateOutlined': <SettingOutlined />,
-    'AuditOutlined': <FileOutlined />,
-  };
-
-  return iconMap[iconName || ''] || <FileOutlined />;
-};
+import { getIconByName } from '@/constants/icons';
 
 interface PrivateLayoutProps {
   children: React.ReactNode;

@@ -28,7 +28,7 @@ export class GroupsController {
   constructor(private readonly groupsService: GroupsService) {}
 
   @Post()
-  @RequirePermissions('system.manage', 'system.groups.manage', 'group.create')
+  @RequirePermissions('groups.create')
   @ApiOperation({ summary: 'Create a new group' })
   @ApiResponse({ status: 201, description: 'The group has been successfully created.' })
   @ApiResponse({ status: 409, description: 'Group code already exists.' })
@@ -37,14 +37,14 @@ export class GroupsController {
   }
 
   @Get()
-  @RequirePermissions('system.manage', 'system.groups.manage')
+  @RequirePermissions('groups.view')
   @ApiOperation({ summary: 'Get all groups' })
   findAll() {
     return this.groupsService.findAll();
   }
 
   @Get(':id')
-  @RequirePermissions('system.manage', 'system.groups.manage')
+  @RequirePermissions('groups.view')
   @ApiOperation({ summary: 'Get a group by ID' })
   @ApiResponse({ status: 404, description: 'Group not found.' })
   findOne(@Param('id', ParseUUIDPipe) id: string) {
@@ -52,7 +52,7 @@ export class GroupsController {
   }
 
   @Patch(':id')
-  @RequirePermissions('system.manage', 'system.groups.manage', 'group.update')
+  @RequirePermissions('groups.edit')
   @ApiOperation({ summary: 'Update a group' })
   @ApiResponse({ status: 404, description: 'Group not found.' })
   update(@Param('id', ParseUUIDPipe) id: string, @Body() updateGroupDto: UpdateGroupDto) {
@@ -61,7 +61,7 @@ export class GroupsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @RequirePermissions('system.manage', 'system.groups.manage', 'group.delete')
+  @RequirePermissions('groups.delete')
   @ApiOperation({ summary: 'Delete a group' })
   @ApiResponse({ status: 204, description: 'The group has been successfully deleted.' })
   @ApiResponse({ status: 404, description: 'Group not found.' })
@@ -70,7 +70,7 @@ export class GroupsController {
   }
 
   @Post(':id/permissions')
-  @RequirePermissions('system.manage', 'system.groups.manage', 'group.assignPermissions')
+  @RequirePermissions('groups.manage_permissions')
   @ApiOperation({ summary: 'Assign permissions to a group' })
   @ApiResponse({ status: 200, description: 'Permissions assigned successfully.' })
   @ApiResponse({ status: 404, description: 'Group or permissions not found.' })
@@ -82,7 +82,7 @@ export class GroupsController {
   }
 
   @Post(':id/users')
-  @RequirePermissions('system.manage', 'system.groups.manage', 'group.update')
+  @RequirePermissions('groups.manage_members')
   @ApiOperation({ summary: 'Add or remove users from a group' })
   @ApiResponse({ status: 200, description: 'Users updated successfully.' })
   @ApiResponse({ status: 404, description: 'Group or users not found.' })

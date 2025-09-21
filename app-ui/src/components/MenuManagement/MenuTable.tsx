@@ -11,10 +11,8 @@ interface MenuTableProps {
   permissions: PermissionResponse[];
   loading: boolean;
   canUpdateMenuName: boolean;
-  canRebindPermission: boolean;
   canDeleteMenu: boolean;
   onEditMenu: (menu: MenuResponse) => void;
-  onRebindPermission: (menu: MenuResponse) => void;
   onDeleteMenu: (menu: MenuResponse) => void;
 }
 
@@ -23,10 +21,8 @@ export const MenuTable: React.FC<MenuTableProps> = ({
   permissions,
   loading,
   canUpdateMenuName,
-  canRebindPermission,
   canDeleteMenu,
   onEditMenu,
-  onRebindPermission,
   onDeleteMenu,
 }) => {
   const columns: ColumnsType<MenuResponse> = [
@@ -126,7 +122,7 @@ export const MenuTable: React.FC<MenuTableProps> = ({
       render: (_, record) => (
         <Space size="small">
           {canUpdateMenuName && (
-            <Tooltip title="Sửa tên menu">
+            <Tooltip title="Sửa menu">
               <Button
                 type="text"
                 size="small"
@@ -139,20 +135,7 @@ export const MenuTable: React.FC<MenuTableProps> = ({
               />
             </Tooltip>
           )}
-          {canRebindPermission && (
-            <Tooltip title="Thay đổi quyền">
-              <Button
-                type="text"
-                size="small"
-                icon={<SafetyCertificateOutlined />}
-                onClick={() => onRebindPermission(record)}
-                style={{
-                  borderRadius: 4,
-                  color: '#52c41a'
-                }}
-              />
-            </Tooltip>
-          )}
+
           {canDeleteMenu && (
             <Tooltip title="Xóa menu">
               <Button

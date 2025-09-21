@@ -16,7 +16,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  @RequirePermissions('system.manage', 'system.users.manage', 'user.create')
+  @RequirePermissions('users.create')
   @ApiOperation({ summary: 'Create a new user' })
   @ApiResponse({ status: 201, description: 'The user has been successfully created.' })
   @ApiResponse({ status: 409, description: 'Email already exists.' })
@@ -25,14 +25,14 @@ export class UsersController {
   }
 
   @Get()
-  @RequirePermissions('system.manage', 'system.users.manage', 'user.read')
+  @RequirePermissions('users.view')
   @ApiOperation({ summary: 'Get all users' })
   findAll() {
     return this.usersService.findAll();
   }
 
   @Get(':id')
-  @RequirePermissions('system.manage', 'system.users.manage', 'user.read')
+  @RequirePermissions('users.view')
   @ApiOperation({ summary: 'Get a user by ID' })
   @ApiResponse({ status: 404, description: 'User not found.' })
   findOne(@Param('id', ParseUUIDPipe) id: string) {
@@ -40,7 +40,7 @@ export class UsersController {
   }
 
   @Patch(':id')
-  @RequirePermissions('system.manage', 'system.users.manage', 'user.update')
+  @RequirePermissions('users.edit')
   @ApiOperation({ summary: 'Update a user' })
   @ApiResponse({ status: 404, description: 'User not found.' })
   update(@Param('id', ParseUUIDPipe) id: string, @Body() updateUserDto: UpdateUserDto) {
@@ -49,7 +49,7 @@ export class UsersController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @RequirePermissions('system.manage', 'system.users.manage', 'user.delete')
+  @RequirePermissions('users.delete')
   @ApiOperation({ summary: 'Delete a user (soft delete)' })
   @ApiResponse({ status: 204, description: 'The user has been successfully deleted.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
@@ -58,7 +58,7 @@ export class UsersController {
   }
 
   @Post(':id/groups')
-  @RequirePermissions('system.manage', 'system.users.manage', 'group.update')
+  @RequirePermissions('users.manage_groups')
   @ApiOperation({ summary: 'Assign groups to a user' })
   @ApiResponse({ status: 200, description: 'Groups assigned successfully.' })
   @ApiResponse({ status: 404, description: 'User or groups not found.' })

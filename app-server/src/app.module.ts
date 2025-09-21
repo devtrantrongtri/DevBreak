@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { User, Group, Permission, Menu, ActivityLog } from './entities';
@@ -12,6 +13,8 @@ import { AuthModule } from './auth/auth.module';
 import { DatabaseModule } from './database/database.module';
 import { ActivityLogsModule } from './activity-logs/activity-logs.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { WebSocketModule } from './websocket/websocket.module';
+import { ActivityLoggingInterceptor } from './common/interceptors/activity-logging.interceptor';
 
 @Module({
   imports: [
@@ -43,9 +46,16 @@ import { DashboardModule } from './dashboard/dashboard.module';
     DatabaseModule,
     ActivityLogsModule,
     DashboardModule,
+    WebSocketModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ActivityLoggingInterceptor,
+    },
+  ],
 })
 export class AppModule {}
 

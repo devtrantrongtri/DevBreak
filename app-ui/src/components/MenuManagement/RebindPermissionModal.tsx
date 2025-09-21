@@ -48,9 +48,14 @@ const RebindPermissionModal: React.FC<RebindPermissionModalProps> = ({
       onCancel={handleCancel}
       footer={null}
       width={500}
+      style={{ top: 20 }}
       styles={{
-        body: { padding: '20px' },
-        header: { padding: '16px 20px', borderBottom: '1px solid #f0f0f0' }
+        body: {
+          maxHeight: 'calc(100vh - 200px)',
+          overflowY: 'auto',
+          padding: '24px'
+        },
+        header: { padding: '16px 24px', borderBottom: '1px solid #f0f0f0' }
       }}
     >
       <Alert

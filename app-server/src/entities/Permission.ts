@@ -13,11 +13,11 @@ export class Permission {
   @Column({ comment: 'Human readable name' })
   name: string;
 
-  @Column({ nullable: true, comment: 'Description of what this permission allows' })
-  description: string;
+  @Column({ type: 'text', nullable: true, comment: 'Description of what this permission allows' })
+  description: string | null;
 
-  @Column({ nullable: true, comment: 'Parent permission code for hierarchical permissions' })
-  parentCode: string;
+  @Column({ type: 'varchar', nullable: true, comment: 'Parent permission code for hierarchical permissions' })
+  parentCode: string | null;
 
   @Column({ default: true, comment: 'Whether this permission is active' })
   isActive: boolean;

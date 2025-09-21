@@ -6,6 +6,8 @@ import { UserOutlined, TeamOutlined, SettingOutlined } from '@ant-design/icons';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import SystemCharts from '@/components/dashboard/SystemCharts';
+import ActivityLogs from '@/components/dashboard/ActivityLogs';
+// ActivityDebug component (có thể xóa nếu không cần)
 import { useTranslation } from 'react-i18next';
 
 const { Title, Paragraph } = Typography;
@@ -15,10 +17,23 @@ const Dashboard: React.FC = () => {
   const router = useRouter();
   const { t } = useTranslation();
   const [refreshKey, setRefreshKey] = React.useState(0);
+  const [showDebug, setShowDebug] = React.useState(false);
+
+  // Toggle debug panel with Ctrl+Shift+D
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+        setShowDebug(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   return (
     <div>
-      <div style={{ marginBottom: 24 }}>
+      <div style={{ marginBottom: 12 }}>
         <Title level={2}>Bảng điều khiển</Title>
         <Paragraph>
           Chào mừng <strong>{user?.displayName}</strong>! Đây là tổng quan hệ thống của bạn.
@@ -26,7 +41,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Biểu đồ hệ thống */}
-      <div style={{ marginBottom: 24 }}>
+      <div style={{ marginBottom: 12 }}>
         <SystemCharts
           key={refreshKey}
           onViewUsers={() => router.push('/dashboard/users')}
@@ -76,6 +91,20 @@ const Dashboard: React.FC = () => {
         </Col>
       </Row>
 
+      {/* Activity Section */}
+      <Row gutter={[16, 16]} style={{ marginBottom: 12,padding:12 }}>
+        <Col xs={24} lg={12}>
+          <ActivityLogs
+            height={450}
+            limit={8}
+            showHeader={true}
+          />
+        </Col>
+        <Col xs={24} lg={12}>
+        
+        </Col>
+      </Row>
+
       {/* Chi tiết quyền */}
       <Card title="Quyền của bạn" style={{ marginBottom: 24 }}>
         <div style={{ maxHeight: 200, overflowY: 'auto' }}>
@@ -90,6 +119,9 @@ const Dashboard: React.FC = () => {
           )}
         </div>
       </Card>
+
+      {/* Debug Panel - Disabled */}
+      {/* <ActivityDebug show={showDebug} /> */}
     </div>
   );
 };

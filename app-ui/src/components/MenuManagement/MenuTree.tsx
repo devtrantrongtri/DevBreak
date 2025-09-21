@@ -11,10 +11,8 @@ interface MenuTreeProps {
   expandedKeys: React.Key[];
   onExpand: (keys: React.Key[]) => void;
   canUpdateMenuName: boolean;
-  canRebindPermission: boolean;
   canDeleteMenu: boolean;
   onEditMenu: (menu: MenuResponse) => void;
-  onRebindPermission: (menu: MenuResponse) => void;
   onDeleteMenu: (menu: MenuResponse) => void;
 }
 
@@ -23,10 +21,8 @@ export const MenuTree: React.FC<MenuTreeProps> = ({
   expandedKeys,
   onExpand,
   canUpdateMenuName,
-  canRebindPermission,
   canDeleteMenu,
   onEditMenu,
-  onRebindPermission,
   onDeleteMenu,
 }) => {
   const buildMenuTree = (): DataNode[] => {
@@ -71,7 +67,7 @@ export const MenuTree: React.FC<MenuTreeProps> = ({
             </Space>
             <Space size="small">
               {canUpdateMenuName && (
-                <Tooltip title="Sửa tên menu">
+                <Tooltip title="Chỉnh sửa menu">
                   <Button
                     type="text"
                     size="small"
@@ -83,24 +79,6 @@ export const MenuTree: React.FC<MenuTreeProps> = ({
                     style={{
                       borderRadius: 4,
                       color: '#1890ff',
-                      padding: '2px 4px'
-                    }}
-                  />
-                </Tooltip>
-              )}
-              {canRebindPermission && (
-                <Tooltip title="Thay đổi quyền">
-                  <Button
-                    type="text"
-                    size="small"
-                    icon={<SafetyCertificateOutlined />}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onRebindPermission(menu);
-                    }}
-                    style={{
-                      borderRadius: 4,
-                      color: '#52c41a',
                       padding: '2px 4px'
                     }}
                   />
