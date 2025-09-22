@@ -9,6 +9,7 @@ import { Project, ProjectMember, ProjectComponentVisibility } from './collab/pro
 // import { Component } from './collab/components/entities/component.entity';
 import { Task, TaskActivity } from './collab/tasks/entities';
 import { Daily } from './collab/dailies/entities/daily.entity';
+import { Meeting, MeetingParticipant, MeetingMessage } from './meetings/entities';
 import { UsersModule } from './users/users.module';
 import { GroupsModule } from './groups/groups.module';
 import { PermissionsModule } from './permissions/permissions.module';
@@ -19,6 +20,7 @@ import { ActivityLogsModule } from './activity-logs/activity-logs.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { WebSocketModule } from './websocket/websocket.module';
 import { CollabModule } from './collab/collab.module';
+import { MeetingsModule } from './meetings/meetings.module';
 import { ActivityLoggingInterceptor } from './common/interceptors/activity-logging.interceptor';
 
 @Module({
@@ -37,7 +39,7 @@ import { ActivityLoggingInterceptor } from './common/interceptors/activity-loggi
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
-        entities: [User, Group, Permission, Menu, ActivityLog, Project, ProjectMember, ProjectComponentVisibility, Task, TaskActivity, Daily],
+        entities: [User, Group, Permission, Menu, ActivityLog, Project, ProjectMember, ProjectComponentVisibility, Task, TaskActivity, Daily, Meeting, MeetingParticipant, MeetingMessage],
         synchronize: true, // Auto-create database schema. Set to false in production.
         // dropSchema: true, // DROP and recreate schema on every restart (DEBUG ONLY)
         logging: false, // Disable SQL logging for cleaner output
@@ -53,6 +55,7 @@ import { ActivityLoggingInterceptor } from './common/interceptors/activity-loggi
     DashboardModule,
     WebSocketModule,
     CollabModule,
+    MeetingsModule,
   ],
   controllers: [AppController],
   providers: [

@@ -14,6 +14,14 @@ import {
 } from '@/types/api';
 import { PaginatedActivityLogs } from '@/types/activity-logs';
 import { Project } from '@/types/collab';
+import { 
+  Meeting, 
+  CreateMeetingDto, 
+  UpdateMeetingDto, 
+  JoinMeetingDto, 
+  UpdateParticipantDto, 
+  SendMessageDto 
+} from '@/types/meeting';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
@@ -397,6 +405,95 @@ class ApiClient {
 
   async getAvailableComponents(): Promise<{ key: string; name: string; description?: string }[]> {
     return this.request('/collab/projects/components/available');
+  }
+
+  // Project Members API
+  async getProjectMembers(projectId: string): Promise<any[]> {
+    return this.request(`/collab/projects/${projectId}/members`);
+  }
+
+  // Meetings endpoints
+  async getMeetings(): Promise<Meeting[]> {
+    return this.request<Meeting[]>('/meetings');
+  }
+
+  async getMeeting(id: string): Promise<Meeting> {
+    return this.request<Meeting>(`/meetings/${id}`);
+  }
+
+  async getMeetingByRoomId(roomId: string): Promise<Meeting> {
+    return this.request<Meeting>(`/meetings/room/${roomId}`);
+  }
+
+  async getMeetingsByProject(projectId: string): Promise<Meeting[]> {
+    return this.request<Meeting[]>(`/meetings/project/${projectId}`);
+  }
+
+  async createMeeting(meetingData: CreateMeetingDto): Promise<Meeting> {
+    return this.request<Meeting>('/meetings', {
+      method: 'POST',
+      data: meetingData,
+    });
+  }
+
+  async updateMeeting(id: string, meetingData: UpdateMeetingDto): Promise<Meeting> {
+    return this.request<Meeting>(`/meetings/${id}`, {
+      method: 'PATCH',
+      data: meetingData,
+    });
+  }
+
+  async deleteMeeting(id: string): Promise<void> {
+    return this.request<void>(`/meetings/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async joinMeeting(roomId: string, joinData: JoinMeetingDto): Promise<Meeting> {
+    return this.request<Meeting>(`/meetings/join/${roomId}`, {
+      method: 'POST',
+      data: joinData,
+    });
+  }
+
+  async leaveMeeting(roomId: string): Promise<void> {
+    return this.request<void>(`/meetings/leave/${roomId}`, {
+      method: 'POST',
+    });
+  }
+
+  async updateParticipant(
+    meetingId: string, 
+    participantId: string, 
+    updateData: UpdateParticipantDto
+  ): Promise<any> {
+    return this.request(`/meetings/${meetingId}/participants/${participantId}`, {
+      method: 'PATCH',
+      data: updateData,
+    });
+  }
+
+  async sendMeetingMessage(meetingId: string, messageData: SendMessageDto): Promise<any> {
+    return this.request(`/meetings/${meetingId}/messages`, {
+      method: 'POST',
+      data: messageData,
+    });
+  }
+
+  async getMeetingMessages(
+    meetingId: string, 
+    params?: { limit?: number; offset?: number }
+  ): Promise<any[]> {
+    const queryParams = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          queryParams.append(key, value.toString());
+        }
+      });
+    }
+    const queryString = queryParams.toString();
+    return this.request(`/meetings/${meetingId}/messages${queryString ? `?${queryString}` : ''}`);
   }
 }
 

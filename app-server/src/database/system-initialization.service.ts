@@ -106,6 +106,16 @@ export class SystemInitializationService implements OnModuleInit {
       { code: 'audit.view', name: 'View Audit Logs', description: 'View system audit logs', parentCode: 'audit' },
       { code: 'audit.export', name: 'Export Audit Logs', description: 'Export audit data', parentCode: 'audit' },
       { code: 'audit.manage', name: 'Manage Audit Settings', description: 'Configure audit settings', parentCode: 'audit' },
+
+      // === MEETINGS PERMISSIONS ===
+      { code: 'meetings', name: 'Meetings Management', description: 'Access to meetings module' },
+      { code: 'meetings.view', name: 'View Meetings', description: 'View meetings and participants', parentCode: 'meetings' },
+      { code: 'meetings.create', name: 'Create Meetings', description: 'Create new meetings', parentCode: 'meetings' },
+      { code: 'meetings.update', name: 'Update Meetings', description: 'Update meeting details', parentCode: 'meetings' },
+      { code: 'meetings.delete', name: 'Delete Meetings', description: 'Delete meetings', parentCode: 'meetings' },
+      { code: 'meetings.join', name: 'Join Meetings', description: 'Join and leave meetings', parentCode: 'meetings' },
+      { code: 'meetings.manage', name: 'Manage Participants', description: 'Manage meeting participants and settings', parentCode: 'meetings' },
+      { code: 'meetings.chat', name: 'Meeting Chat', description: 'Send and view chat messages in meetings', parentCode: 'meetings' },
     ];
 
     for (const permissionData of basicPermissions) {
@@ -263,6 +273,13 @@ export class SystemInitializationService implements OnModuleInit {
         order: 4,
         parentPath: '/dashboard/system',
         permissionCode: 'audit.view'
+      },
+      {
+        name: 'Meetings',
+        path: '/dashboard/meetings',
+        icon: 'VideoCameraOutlined',
+        order: 3,
+        permissionCode: 'meetings.view'
       }
     ];
 
