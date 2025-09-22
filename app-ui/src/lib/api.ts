@@ -13,6 +13,7 @@ import {
   SeedResponse,
 } from '@/types/api';
 import { PaginatedActivityLogs } from '@/types/activity-logs';
+import { Project } from '@/types/collab';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
@@ -39,9 +40,9 @@ class ApiClient {
     }
   }
 
-  private async request<T>(
+  async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit & { data?: any } = {}
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
     const headers: Record<string, string> = {
@@ -53,8 +54,14 @@ class ApiClient {
       headers.Authorization = `Bearer ${this.token}`;
     }
 
+    // Handle data field
+    const { data, ...fetchOptions } = options;
+    if (data && !fetchOptions.body) {
+      fetchOptions.body = JSON.stringify(data);
+    }
+
     const response = await fetch(url, {
-      ...options,
+      ...fetchOptions,
       headers,
     });
 
@@ -67,8 +74,24 @@ class ApiClient {
     if (response.status === 204) {
       return {} as T;
     }
-    
-    return response.json();
+
+    // Handle empty responses
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      return {} as T;
+    }
+
+    const text = await response.text();
+    if (!text.trim()) {
+      return {} as T;
+    }
+
+    try {
+      return JSON.parse(text);
+    } catch (error) {
+      console.warn('Failed to parse JSON response:', text);
+      return {} as T;
+    }
   }
 
   // Auth endpoints
@@ -257,6 +280,19 @@ class ApiClient {
     });
   }
 
+  // Permission sync endpoints
+  async post(url: string): Promise<any> {
+    return this.request(url, {
+      method: 'POST',
+    });
+  }
+
+  async get(url: string): Promise<any> {
+    return this.request(url, {
+      method: 'GET',
+    });
+  }
+
   // Dashboard endpoints
   async getDashboardStats(): Promise<any> {
     return this.request('/dashboard/stats');
@@ -339,6 +375,28 @@ class ApiClient {
     return this.request<SeedResponse>('/seed', {
       method: 'POST',
     });
+  }
+
+  // Admin Projects API
+  async getAllProjectsForAdmin(): Promise<Project[]> {
+    return this.request<Project[]>('/collab/projects/admin/all');
+  }
+
+  // Component Visibility API
+  async addComponentToProject(projectId: string, componentData: {
+    componentKey: string;
+    displayName: string;
+    description?: string;
+    defaultRoles?: string[];
+  }): Promise<any> {
+    return this.request(`/collab/projects/${projectId}/components`, {
+      method: 'POST',
+      data: componentData
+    });
+  }
+
+  async getAvailableComponents(): Promise<{ key: string; name: string; description?: string }[]> {
+    return this.request('/collab/projects/components/available');
   }
 }
 

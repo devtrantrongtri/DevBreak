@@ -53,6 +53,31 @@ export class PermissionsController {
     return this.permissionsService.getPermissionTree();
   }
 
+  @Get('discover')
+  @RequirePermissions('permissions.sync')
+  @ApiOperation({ summary: 'Discover permissions from code' })
+  @ApiResponse({ status: 200, description: 'Permissions discovered successfully.' })
+  async discoverPermissions() {
+    const discovered = await this.permissionDiscoveryService.discoverPermissions();
+    return {
+      message: 'Permissions discovered successfully',
+      count: discovered.length,
+      permissions: discovered
+    };
+  }
+
+  @Get('modules')
+  @RequirePermissions('permissions.view')
+  @ApiOperation({ summary: 'Get permissions organized by modules' })
+  @ApiResponse({ status: 200, description: 'Permission modules retrieved successfully.' })
+  async getPermissionModules() {
+    const modules = await this.permissionDiscoveryService.getPermissionsByModules();
+    return {
+      message: 'Permission modules retrieved successfully',
+      modules
+    };
+  }
+
   @Get(':id')
   @RequirePermissions('permissions.view')
   @ApiOperation({ summary: 'Get a permission by ID' })
@@ -88,19 +113,6 @@ export class PermissionsController {
     return { message: 'Permissions seeded successfully' };
   }
 
-  @Get('discover')
-  @RequirePermissions('permissions.sync')
-  @ApiOperation({ summary: 'Discover permissions from code' })
-  @ApiResponse({ status: 200, description: 'Permissions discovered successfully.' })
-  async discoverPermissions() {
-    const discovered = await this.permissionDiscoveryService.discoverPermissions();
-    return {
-      message: 'Permissions discovered successfully',
-      count: discovered.length,
-      permissions: discovered
-    };
-  }
-
   @Post('sync')
   @RequirePermissions('permissions.sync')
   @ApiOperation({ summary: 'Sync discovered permissions with database' })
@@ -110,18 +122,6 @@ export class PermissionsController {
     return {
       message: 'Permissions synced successfully',
       ...result
-    };
-  }
-
-  @Get('modules')
-  @RequirePermissions('permissions.view')
-  @ApiOperation({ summary: 'Get permissions organized by modules' })
-  @ApiResponse({ status: 200, description: 'Permission modules retrieved successfully.' })
-  async getPermissionModules() {
-    const modules = await this.permissionDiscoveryService.getPermissionsByModules();
-    return {
-      message: 'Permission modules retrieved successfully',
-      modules
     };
   }
 

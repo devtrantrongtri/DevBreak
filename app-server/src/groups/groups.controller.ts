@@ -92,4 +92,16 @@ export class GroupsController {
   ) {
     return this.groupsService.manageUsers(id, upsertGroupUsersDto);
   }
+
+  @Delete(':id/users/:userId')
+  @RequirePermissions('groups.manage_members')
+  @ApiOperation({ summary: 'Remove a user from a group' })
+  @ApiResponse({ status: 200, description: 'User removed successfully.' })
+  @ApiResponse({ status: 404, description: 'Group or user not found.' })
+  removeUser(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('userId', ParseUUIDPipe) userId: string,
+  ) {
+    return this.groupsService.removeUser(id, userId);
+  }
 }

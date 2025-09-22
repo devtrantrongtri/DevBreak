@@ -1,0 +1,212 @@
+/* Task Board Responsive Styles */
+.taskBoardGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  height: calc(100vh - 300px);
+  min-height: 500px;
+}
+
+/* Tablet - 2 columns */
+@media (max-width: 1200px) {
+  .taskBoardGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+/* Mobile - 1 column */
+@media (max-width: 768px) {
+  .taskBoardGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    height: auto;
+  }
+}
+
+/* Task Column Responsive */
+.taskColumn {
+  flex: 1;
+  min-width: 280px;
+  background: #fafafa;
+  border-radius: 8px;
+  border: 1px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+  transition: all 0.2s ease;
+}
+
+.taskColumn.isOver {
+  background: #f0f9ff;
+  border: 2px dashed #1890ff;
+}
+
+@media (max-width: 768px) {
+  .taskColumn {
+    min-width: 100%;
+    margin: 0;
+  }
+}
+
+/* Task Card Responsive */
+.taskCard {
+  margin-bottom: 8px;
+  cursor: grab;
+  transition: all 0.2s ease;
+}
+
+.taskCard:active {
+  cursor: grabbing;
+}
+
+.taskCard.isDragging {
+  opacity: 0.5;
+  transform: rotate(5deg);
+}
+
+/* Filters Responsive */
+.filtersContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 768px) {
+  .filtersContainer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+}
+
+/* Actions Responsive */
+.actionsContainer {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .actionsContainer {
+    justify-content: stretch;
+  }
+  
+  .actionsContainer > * {
+    flex: 1;
+  }
+}
+
+/* Stats Bar */
+.statsBar {
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: #666;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+}
+
+@media (max-width: 768px) {
+  .statsBar {
+    font-size: 11px;
+    padding: 6px 8px;
+  }
+}
+
+/* Drag Overlay */
+.dragOverlay {
+  transform: rotate(5deg);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border: 2px solid #1890ff;
+}
+
+/* Loading State */
+.loadingContainer {
+  text-align: center;
+  padding: 40px 0;
+}
+
+@media (max-width: 768px) {
+  .loadingContainer {
+    padding: 20px 0;
+  }
+}
+
+/* Scrollbar Styling */
+.taskColumn::-webkit-scrollbar {
+  width: 6px;
+}
+
+.taskColumn::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.taskColumn::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.taskColumn::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Animation for new tasks */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.taskCard.newTask {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Hover effects */
+.taskColumn:hover {
+  border-color: #d9d9d9;
+}
+
+.taskCard:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Focus states for accessibility */
+.taskCard:focus-visible {
+  outline: 2px solid #1890ff;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .taskColumn {
+    border: 2px solid #000;
+  }
+  
+  .taskCard {
+    border: 1px solid #000;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .taskCard,
+  .taskColumn {
+    transition: none;
+  }
+  
+  .taskCard.newTask {
+    animation: none;
+  }
+}

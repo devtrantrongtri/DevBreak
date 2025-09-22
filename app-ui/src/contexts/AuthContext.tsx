@@ -15,6 +15,7 @@ interface AuthContextType {
   logout: () => void;
   refreshUserData: () => Promise<void>;
   getToken: () => string | null;
+  hasPermission: (permission: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -39,6 +40,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const { message: messageApi } = App.useApp();
 
   const isAuthenticated = !!user;
+
+  // Check if user has a specific permission
+  const hasPermission = useCallback((permission: string): boolean => {
+    if (!user || !permissions) return false;
+    return permissions.includes(permission);
+  }, [user, permissions]);
 
   const login = async (email: string, password: string) => {
     try {
@@ -116,6 +123,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     logout,
     refreshUserData,
     getToken,
+    hasPermission,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

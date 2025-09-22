@@ -63,11 +63,16 @@ export default function GroupMembersPage() {
   const fetchGroupDetails = async () => {
     try {
       setLoading(true);
-      const response = await apiClient.get(`/groups/${groupId}`);
-      setGroup(response.data);
-    } catch (error) {
+      console.log(`[GroupMembers] Fetching group details for ID: ${groupId}`);
+
+      const response = await apiClient.request<Group>(`/groups/${groupId}`);
+      console.log(`[GroupMembers] Group details loaded:`, response);
+
+      setGroup(response);
+    } catch (error: any) {
       console.error('Error fetching group details:', error);
-      message.error('Failed to load group details');
+      console.error('Error response:', error?.response?.data);
+      message.error(`Failed to load group details: ${error?.message || 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
@@ -75,8 +80,8 @@ export default function GroupMembersPage() {
 
   const fetchAvailableUsers = async () => {
     try {
-      const response = await apiClient.get('/users');
-      setAvailableUsers(response.data.users || []);
+      const response = await apiClient.request<User[]>('/users');
+      setAvailableUsers(response || []);
     } catch (error) {
       console.error('Error fetching users:', error);
     }
@@ -90,8 +95,12 @@ export default function GroupMembersPage() {
 
     try {
       setActionLoading(true);
-      await apiClient.post(`/groups/${groupId}/users`, {
-        userIds: selectedUserIds,
+      await apiClient.request(`/groups/${groupId}/users`, {
+        method: 'POST',
+        data: {
+          addUserIds: selectedUserIds,
+          removeUserIds: [], // Empty array for remove
+        }
       });
       message.success('Users added successfully');
       setAddModalVisible(false);
@@ -111,7 +120,9 @@ export default function GroupMembersPage() {
       content: 'Are you sure you want to remove this user from the group?',
       onOk: async () => {
         try {
-          await apiClient.delete(`/groups/${groupId}/users/${userId}`);
+          await apiClient.request(`/groups/${groupId}/users/${userId}`, {
+            method: 'DELETE'
+          });
           message.success('User removed successfully');
           fetchGroupDetails();
         } catch (error) {

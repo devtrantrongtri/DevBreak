@@ -1,4 +1,4 @@
-import { IsArray, IsString, IsUUID } from 'class-validator';
+import { IsArray, IsString, IsUUID, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class AssignPermissionsDto {
@@ -10,11 +10,13 @@ export class AssignPermissionsDto {
 
 export class UpsertGroupUsersDto {
   @ApiProperty({ example: ['uuid1', 'uuid2'], description: 'Array of user IDs to add to the group', required: false })
+  @IsOptional()
   @IsArray()
   @IsUUID('4', { each: true })
   addUserIds?: string[];
 
   @ApiProperty({ example: ['uuid3', 'uuid4'], description: 'Array of user IDs to remove from the group', required: false })
+  @IsOptional()
   @IsArray()
   @IsUUID('4', { each: true })
   removeUserIds?: string[];

@@ -102,7 +102,13 @@ const PermissionsPage: React.FC = () => {
       setLastSyncTime(new Date());
       await fetchPermissions();
       await fetchModules();
-      return response.data;
+      // Backend returns the result directly, not wrapped in data
+      return {
+        created: response.created || [],
+        updated: response.updated || [],
+        discovered: response.discovered || 0,
+        existing: response.existing || 0
+      };
     } catch (error) {
       console.error('Sync failed:', error);
       throw new Error('Sync failed');
@@ -112,7 +118,7 @@ const PermissionsPage: React.FC = () => {
   const handleDiscover = async (): Promise<DiscoveredPermission[]> => {
     try {
       const response = await apiClient.get('/permissions/discover');
-      return response.data.permissions || [];
+      return response.permissions || [];
     } catch (error) {
       console.error('Discovery failed:', error);
       throw new Error('Discovery failed');

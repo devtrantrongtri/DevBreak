@@ -44,15 +44,19 @@ export class GroupsService {
   }
 
   async findOne(id: string): Promise<Group> {
+    console.log(`[GroupsService] Finding group with ID: ${id}`);
+
     const group = await this.groupRepository.findOne({
       where: { id },
       relations: ['permissions', 'users'],
     });
 
     if (!group) {
+      console.log(`[GroupsService] Group not found with ID: ${id}`);
       throw new NotFoundException(`Group with ID "${id}" not found`);
     }
 
+    console.log(`[GroupsService] Found group: ${group.name} with ${group.users?.length || 0} users`);
     return group;
   }
 
@@ -133,5 +137,24 @@ export class GroupsService {
     await this.groupRepository.save(group);
 
     return this.findOne(id);
+  }
+
+  async removeUser(groupId: string, userId: string): Promise<Group> {
+    console.log(`[GroupsService] Removing user ${userId} from group ${groupId}`);
+
+    const group = await this.findOne(groupId);
+
+    // Check if user is in the group
+    const userIndex = group.users?.findIndex(user => user.id === userId) ?? -1;
+    if (userIndex === -1) {
+      throw new NotFoundException(`User not found in group`);
+    }
+
+    // Remove user from group
+    group.users = group.users?.filter(user => user.id !== userId) || [];
+    await this.groupRepository.save(group);
+
+    console.log(`[GroupsService] User removed successfully. Group now has ${group.users.length} users`);
+    return this.findOne(groupId);
   }
 }
