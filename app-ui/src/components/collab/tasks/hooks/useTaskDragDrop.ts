@@ -37,20 +37,20 @@ export const useTaskDragDrop = ({
 
   const handleDragEnd = useCallback(async (event: DragEndEvent) => {
     const { active, over } = event;
-    
+
     setActiveTask(null);
 
     if (!over || !active) return;
 
     const taskId = active.id as string;
     const task = tasks.find(t => t.id === taskId);
-    
+
     if (!task) return;
 
     // Check if dropping on a column
     if (over.id.toString().startsWith('column-')) {
       const newStatus = over.id.toString().replace('column-', '') as Task['status'];
-      
+
       if (task.status !== newStatus) {
         try {
           await onTaskMove(taskId, newStatus);

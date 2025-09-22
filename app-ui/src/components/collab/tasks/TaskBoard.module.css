@@ -4,7 +4,10 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
   height: calc(100vh - 300px);
-  min-height: 500px;
+  /* min-height: 500px; */
+  position: relative; /* Ensure proper positioning context */
+  overflow: visible; /* Prevent clipping of drag elements */
+  z-index: 1; /* Ensure proper stacking context */
 }
 
 /* Tablet - 2 columns */
@@ -27,13 +30,14 @@
 /* Task Column Responsive */
 .taskColumn {
   flex: 1;
-  min-width: 280px;
+  min-width: 220px;
   background: #fafafa;
   border-radius: 8px;
   border: 1px solid #f0f0f0;
   display: flex;
   flex-direction: column;
-  height: fit-content;
+  position: relative; /* Ensure proper positioning for droppable */
+  transform: none; /* Remove any transforms that might affect positioning */
   transition: all 0.2s ease;
 }
 
@@ -54,16 +58,30 @@
   margin-bottom: 8px;
   cursor: grab;
   transition: all 0.2s ease;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+}
+
+.taskCard:hover {
+  border-color: #1890ff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
 }
 
 .taskCard:active {
   cursor: grabbing;
 }
 
-.taskCard.isDragging {
-  opacity: 0.5;
-  transform: rotate(5deg);
+/* Compact card styling */
+.taskCard .ant-card-body {
+  padding: 8px !important;
 }
+
+.taskCard .ant-typography {
+  margin-bottom: 0 !important;
+}
+
+
 
 /* Filters Responsive */
 .filtersContainer {
@@ -118,11 +136,21 @@
   }
 }
 
-/* Drag Overlay */
-.dragOverlay {
-  transform: rotate(5deg);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  border: 2px solid #1890ff;
+/* Ensure proper positioning for drag operations */
+.taskBoardGrid {
+  position: relative;
+}
+
+/* Drag Overlay - Apply styles directly to dragging cards */
+.taskCard.isDragging {
+  opacity: 0.9;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+  border: 2px solid #1890ff !important;
+  margin: 0 !important;
+  pointer-events: none;
+  z-index: 1000;
+  transform: rotate(2deg) !important;
+  cursor: grabbing !important;
 }
 
 /* Loading State */

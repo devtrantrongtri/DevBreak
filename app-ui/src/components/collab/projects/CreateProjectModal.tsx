@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   Modal,
   Form,
@@ -9,7 +9,8 @@ import {
   Button,
   message,
   Space,
-  Typography
+  Typography,
+  App
 } from 'antd';
 import { ProjectOutlined, PlusOutlined } from '@ant-design/icons';
 import { apiClient } from '@/lib/api';
@@ -39,6 +40,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
   const [form] = Form.useForm<CreateProjectForm>();
   const [loading, setLoading] = useState(false);
   const { refreshProjects } = useProject();
+  const { message: messageApi } = App.useApp();
 
   const handleSubmit = async (values: CreateProjectForm) => {
     try {
@@ -49,14 +51,14 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
         body: JSON.stringify(values)
       });
 
-      message.success('Tạo dự án thành công!');
+      messageApi.success('Tạo dự án thành công!');
       form.resetFields();
       await refreshProjects();
       onSuccess?.();
       onCancel();
     } catch (error: any) {
       console.error('Create project failed:', error);
-      message.error(error?.message || 'Tạo dự án thất bại');
+      messageApi.error(error?.message || 'Tạo dự án thất bại');
     } finally {
       setLoading(false);
     }
@@ -68,16 +70,19 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
   };
 
   // Auto-generate code from name
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value;
     const code = name
       .toUpperCase()
       .replace(/[^A-Z0-9\s]/g, '')
       .replace(/\s+/g, '_')
       .substring(0, 10);
-    
-    form.setFieldValue('code', code);
-  };
+
+    // Use setTimeout to avoid circular updates
+    setTimeout(() => {
+      form.setFieldValue('code', code);
+    }, 0);
+  }, [form]);
 
   return (
     <Modal

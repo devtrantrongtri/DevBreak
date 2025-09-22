@@ -12,6 +12,7 @@ import TaskBoard from '../tasks/TaskBoard';
 import ProjectSelector from '../layout/ProjectSelector';
 import EmptyProjectState from '../projects/EmptyProjectState';
 import CreateTaskModal from '../tasks/CreateTaskModal';
+import EditTaskModal from '../tasks/EditTaskModal';
 import CreateDailyModal from '../dailies/CreateDailyModal';
 import ProjectMembersModal from '../projects/ProjectMembersModal';
 import VisibilityWrapper from '../common/VisibilityWrapper';
@@ -45,6 +46,7 @@ const CollabDashboard: React.FC = () => {
   const [membersModalVisible, setMembersModalVisible] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [taskInitialStatus, setTaskInitialStatus] = useState<'todo' | 'in_process' | 'ready_for_qc' | 'done'>('todo');
+  const [taskRefreshTrigger, setTaskRefreshTrigger] = useState(0);
 
   // Filter sections based on user role
   const visibleSections = DASHBOARD_SECTIONS.filter(section => 
@@ -191,6 +193,7 @@ const CollabDashboard: React.FC = () => {
                     onTaskCreate={handleTaskCreate}
                     onTaskEdit={handleTaskEdit}
                     onCreateDaily={handleDailyCreate}
+                    refreshTrigger={section.id === 'task-board' ? taskRefreshTrigger : undefined}
                     {...(section.props || {})}
                   />
                 </DashboardCard>
@@ -218,7 +221,9 @@ const CollabDashboard: React.FC = () => {
         visible={createTaskModalVisible}
         onCancel={() => setCreateTaskModalVisible(false)}
         onSuccess={() => {
-          // Refresh tasks when implemented
+          setCreateTaskModalVisible(false);
+          // Trigger refresh of TaskBoard
+          setTaskRefreshTrigger(prev => prev + 1);
         }}
         initialStatus={taskInitialStatus}
       />
@@ -231,21 +236,26 @@ const CollabDashboard: React.FC = () => {
         }}
       />
 
-      <Modal
-        title="Chỉnh sửa Task"
-        open={editTaskModalVisible}
-        onCancel={() => setEditTaskModalVisible(false)}
-        footer={null}
-        width={600}
-      >
-        {/* EditTaskModal component would go here */}
-        <div style={{ padding: '20px 0' }}>
-          <p>EditTaskModal component sẽ được implement ở đây</p>
-          {selectedTask && (
-            <pre>{JSON.stringify(selectedTask, null, 2)}</pre>
-          )}
-        </div>
-      </Modal>
+      <EditTaskModal
+        visible={editTaskModalVisible}
+        task={selectedTask}
+        onCancel={() => {
+          setEditTaskModalVisible(false);
+          setSelectedTask(null);
+        }}
+        onSuccess={() => {
+          setEditTaskModalVisible(false);
+          setSelectedTask(null);
+          // Trigger refresh of TaskBoard
+          setTaskRefreshTrigger(prev => prev + 1);
+        }}
+        onDelete={(taskId) => {
+          setEditTaskModalVisible(false);
+          setSelectedTask(null);
+          // Trigger refresh of TaskBoard after deletion
+          setTaskRefreshTrigger(prev => prev + 1);
+        }}
+      />
 
       {currentProject && (
         <ProjectMembersModal
