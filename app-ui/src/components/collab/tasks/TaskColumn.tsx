@@ -12,6 +12,11 @@ import styles from './TaskBoard.module.css';
 
 const { Text } = Typography;
 
+const CARD_HEIGHT = 100;
+const CARD_GAP = 8;
+const BODY_PADDING_Y = 12;
+const BODY_MAX_HEIGHT = (CARD_HEIGHT * 4) + (CARD_GAP * 3) + (BODY_PADDING_Y * 2);
+
 interface TaskColumnProps {
   column: TaskColumnType;
   tasks: Task[];
@@ -124,8 +129,8 @@ const TaskColumn: React.FC<TaskColumnProps> = ({
       {/* Column Content */}
       <div style={{
         padding: 12,
-        minHeight: 200,
-        maxHeight: 'calc(100vh - 400px)',
+        minHeight: BODY_MAX_HEIGHT,
+        maxHeight: BODY_MAX_HEIGHT,
         overflowY: 'auto',
         flex: 1
       }}>

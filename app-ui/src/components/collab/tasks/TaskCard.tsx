@@ -1,23 +1,23 @@
 'use client';
 
 import React from 'react';
-import { Card, Typography, Space, Avatar, Tag, Tooltip, Button } from 'antd';
+import { Card, Typography, Space, Avatar, Tag, Tooltip } from 'antd';
 import {
   UserOutlined,
   CalendarOutlined,
-  EditOutlined,
   ClockCircleOutlined,
-  ExclamationCircleOutlined,
-  DragOutlined
+  ExclamationCircleOutlined
 } from '@ant-design/icons';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Task, TASK_PRIORITIES } from '@/types/collab';
-import { useProject } from '@/contexts/ProjectContext';
+
 import dayjs from 'dayjs';
 import styles from './TaskBoard.module.css';
 
-const { Text, Paragraph } = Typography;
+const { Text } = Typography;
+
+const CARD_HEIGHT = 100; // Reduced height for more compact design
 
 interface TaskCardProps {
   task: Task;
@@ -34,7 +34,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   draggable = true,
   isDragging = false
 }) => {
-  const { userRole, canPerformAction } = useProject();
+
 
   const {
     attributes,
@@ -61,18 +61,15 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const isOverdue = task.dueDate && dayjs(task.dueDate).isBefore(dayjs(), 'day');
   const isDueSoon = task.dueDate && dayjs(task.dueDate).diff(dayjs(), 'day') <= 2 && !isOverdue;
 
-  const canEdit = canPerformAction('update_task') || 
-    (userRole === 'DEV' && task.assigneeId === task.assigneeId) ||
-    (userRole === 'QC' && task.status === 'ready_for_qc');
 
-  const handleEdit = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onEdit?.(task);
-  };
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+    height: CARD_HEIGHT,
+    display: 'flex',
+    flexDirection: 'column' as const,
+    justifyContent: 'space-between',
     border: isOverdue ? '1px solid #ff4d4f' : undefined,
     borderLeft: isOverdue ? '4px solid #ff4d4f' :
                isDueSoon ? '4px solid #faad14' : undefined,
@@ -83,148 +80,137 @@ const TaskCard: React.FC<TaskCardProps> = ({
     isSortableDragging || isDragging ? styles.isDragging : '',
   ].filter(Boolean).join(' ');
 
+  const handleCardClick = () => {
+    onEdit?.(task);
+  };
+
   return (
     <Card
       ref={setNodeRef}
       size="small"
       className={cardClasses}
       style={style}
-      bodyStyle={{ padding: 12 }}
+      styles={{ body: { padding: 8 } }}
       hoverable={!isSortableDragging}
+      onClick={handleCardClick}
       {...attributes}
+      {...(draggable ? listeners : {})}
     >
-      {/* Header */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
+      {/* Header - Title and Priority */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
         alignItems: 'flex-start',
-        marginBottom: 8
+        marginBottom: 6
       }}>
-        <div style={{ flex: 1, marginRight: 8 }}>
-          <Text strong style={{ fontSize: '13px', lineHeight: 1.3 }}>
+        <Tooltip title={task.title} placement="topLeft">
+          <Text
+            strong
+            style={{
+              fontSize: '13px',
+              lineHeight: 1.2,
+              display: 'block',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              maxWidth: '140px'
+            }}
+          >
             {task.title}
           </Text>
-        </div>
-        
-        <Space size={4}>
-          <Tag
-            color={getPriorityColor(task.priority)}
-            size="small"
-            style={{ margin: 0, fontSize: '10px' }}
-          >
-            {TASK_PRIORITIES[task.priority]}
-          </Tag>
+        </Tooltip>
 
-          {draggable && (
-            <Button
-              type="text"
-              size="small"
-              icon={<DragOutlined />}
-              style={{
-                padding: '2px 4px',
-                height: 'auto',
-                cursor: 'grab',
-                color: '#999'
-              }}
-              {...listeners}
-            />
-          )}
-
-          {canEdit && (
-            <Button
-              type="text"
-              size="small"
-              icon={<EditOutlined />}
-              onClick={handleEdit}
-              style={{ padding: '2px 4px', height: 'auto' }}
-            />
-          )}
-        </Space>
+        <Tag
+          color={getPriorityColor(task.priority)}
+          style={{
+            margin: 0,
+            fontSize: '9px',
+            padding: '0 4px',
+            lineHeight: '16px',
+            height: '16px'
+          }}
+        >
+          {TASK_PRIORITIES[task.priority]}
+        </Tag>
       </div>
 
-      {/* Description */}
+      {/* Description - Compact */}
       {task.description && (
-        <Paragraph
-          style={{ 
-            margin: '0 0 8px 0', 
-            fontSize: '12px',
-            color: '#666',
-            lineHeight: 1.3
-          }}
-          ellipsis={{ rows: 2 }}
-        >
-          {task.description}
-        </Paragraph>
+        <Tooltip title={task.description} placement="bottomLeft">
+          <Text
+            style={{
+              fontSize: '11px',
+              color: '#666',
+              lineHeight: 1.3,
+              display: 'block',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              marginBottom: 6
+            }}
+          >
+            {task.description}
+          </Text>
+        </Tooltip>
       )}
 
-      {/* Assignee */}
-      {task.assignee && (
-        <div style={{ marginBottom: 8 }}>
+      {/* Middle Row - Assignee and Due Date */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 4
+      }}>
+        {/* Assignee */}
+        {task.assignee ? (
           <Space size={4}>
-            <Avatar 
-              size={16} 
-              icon={<UserOutlined />}
-              src={task.assignee.avatar}
-            />
-            <Text style={{ fontSize: '11px', color: '#666' }}>
-              {task.assignee.displayName}
+            <Avatar size={14} icon={<UserOutlined />} />
+            <Text style={{ fontSize: '10px', color: '#666' }}>
+              {task.assignee.displayName.split(' ').slice(-1)[0]} {/* Show only last name */}
             </Text>
           </Space>
-        </div>
-      )}
+        ) : (
+          <Text style={{ fontSize: '10px', color: '#ccc' }}>Chưa assign</Text>
+        )}
 
-      {/* Footer */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        fontSize: '11px',
-        color: '#999'
-      }}>
-        <div>
-          {task.dueDate && (
-            <Space size={4}>
-              {isOverdue ? (
-                <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />
-              ) : isDueSoon ? (
-                <ClockCircleOutlined style={{ color: '#faad14' }} />
-              ) : (
-                <CalendarOutlined />
-              )}
-              <Text 
-                style={{ 
-                  fontSize: '11px',
-                  color: isOverdue ? '#ff4d4f' : isDueSoon ? '#faad14' : '#999'
-                }}
-              >
-                {dayjs(task.dueDate).format('DD/MM')}
-              </Text>
-            </Space>
-          )}
-        </div>
-
-        <div>
-          <Text style={{ fontSize: '10px', color: '#ccc' }}>
-            #{task.id.slice(-6)}
-          </Text>
-        </div>
+        {/* Due Date */}
+        {task.dueDate && (
+          <Space size={2}>
+            {isOverdue ? (
+              <ExclamationCircleOutlined style={{ color: '#ff4d4f', fontSize: '10px' }} />
+            ) : isDueSoon ? (
+              <ClockCircleOutlined style={{ color: '#faad14', fontSize: '10px' }} />
+            ) : (
+              <CalendarOutlined style={{ fontSize: '10px' }} />
+            )}
+            <Text
+              style={{
+                fontSize: '10px',
+                color: isOverdue ? '#ff4d4f' : isDueSoon ? '#faad14' : '#999'
+              }}
+            >
+              {dayjs(task.dueDate).format('DD/MM')}
+            </Text>
+          </Space>
+        )}
       </div>
 
-      {/* Overdue warning */}
-      {isOverdue && (
-        <div style={{ 
-          marginTop: 8, 
-          padding: '4px 8px', 
-          background: '#fff2f0',
-          borderRadius: 4,
-          border: '1px solid #ffccc7'
-        }}>
-          <Text style={{ fontSize: '10px', color: '#ff4d4f' }}>
-            <ExclamationCircleOutlined style={{ marginRight: 4 }} />
-            Quá hạn {dayjs().diff(dayjs(task.dueDate), 'day')} ngày
+      {/* Footer - Task ID and Status Indicator */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <Text style={{ fontSize: '9px', color: '#ccc' }}>
+          #{task.id.slice(-6)}
+        </Text>
+
+        {isOverdue && (
+          <Text style={{ fontSize: '9px', color: '#ff4d4f' }}>
+            Quá hạn {dayjs().diff(dayjs(task.dueDate), 'day')}d
           </Text>
-        </div>
-      )}
+        )}
+      </div>
     </Card>
   );
 };

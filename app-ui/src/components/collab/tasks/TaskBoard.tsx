@@ -1,18 +1,21 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Space, Button, Spin, Alert } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 import {
   DndContext,
   DragOverlay,
   closestCorners,
+  pointerWithin,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
+import { snapCenterToCursor } from '@dnd-kit/modifiers';
+
 import { useProject } from '@/contexts/ProjectContext';
 import { Task, TaskColumn as TaskColumnType } from '@/types/collab';
 import { useTaskBoard } from './hooks/useTaskBoard';
@@ -55,27 +58,53 @@ const TASK_COLUMNS: TaskColumnType[] = [
 interface TaskBoardProps {
   onTaskCreate?: (status?: Task['status']) => void;
   onTaskEdit?: (task: Task) => void;
+  refreshTrigger?: number; // Add this to trigger refresh from parent
 }
 
 const TaskBoard: React.FC<TaskBoardProps> = ({
   onTaskCreate,
-  onTaskEdit
+  onTaskEdit,
+  refreshTrigger
 }) => {
   const { currentProject } = useProject();
 
   // Custom hooks
   const { tasks, loading, error, loadTasks, moveTask } = useTaskBoard();
   const { filters, setFilters, filteredTasks, clearFilters, hasActiveFilters } = useTaskFilters(tasks);
+
+  // Custom collision detection for better accuracy
+  const customCollisionDetection = (args: any) => {
+    // First, try pointer-based collision detection for high precision
+    const pointerCollisions = pointerWithin(args);
+
+    if (pointerCollisions.length > 0) {
+      return pointerCollisions;
+    }
+
+    // Fallback to closest corners for keyboard navigation and edge cases
+    return closestCorners(args);
+  };
+
+
+
+
   const { activeTask, handleDragStart, handleDragOver, handleDragEnd } = useTaskDragDrop({
     tasks: filteredTasks,
     onTaskMove: moveTask,
   });
 
+  // Refresh tasks when refreshTrigger changes
+  useEffect(() => {
+    if (refreshTrigger) {
+      loadTasks();
+    }
+  }, [refreshTrigger, loadTasks]);
+
   // DnD sensors
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8,
+        distance: 4,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -89,6 +118,10 @@ const TaskBoard: React.FC<TaskBoardProps> = ({
 
   const handleTaskEdit = (task: Task) => {
     onTaskEdit?.(task);
+  };
+
+  const handleTaskMove = (task: Task, newStatus: Task['status']) => {
+    moveTask(task.id, newStatus);
   };
 
 
@@ -127,7 +160,13 @@ const TaskBoard: React.FC<TaskBoardProps> = ({
   }
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div style={{
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      position: 'relative', // Ensure proper positioning context for DnD
+      overflow: 'visible' // Prevent clipping of drag overlay
+    }}>
       {/* Header */}
       <div className={styles.filtersContainer}>
         {/* Filters */}
@@ -177,7 +216,7 @@ const TaskBoard: React.FC<TaskBoardProps> = ({
       ) : (
         <DndContext
           sensors={sensors}
-          collisionDetection={closestCorners}
+          collisionDetection={customCollisionDetection}
           onDragStart={handleDragStart}
           onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
@@ -190,21 +229,26 @@ const TaskBoard: React.FC<TaskBoardProps> = ({
                 tasks={tasksByStatus[column.status] || []}
                 onTaskEdit={handleTaskEdit}
                 onTaskCreate={handleTaskCreate}
-                onTaskMove={moveTask}
+                onTaskMove={handleTaskMove}
                 activeTaskId={activeTask?.id}
               />
             ))}
           </div>
-
-          <DragOverlay>
+ 
+          <DragOverlay
+            modifiers={[snapCenterToCursor]}
+            dropAnimation={null}
+            style={{
+              zIndex: 9999,
+              pointerEvents: 'none' // Ensure overlay doesn't interfere with collision detection
+            }}
+          >
             {activeTask ? (
-              <div className={styles.dragOverlay}>
-                <TaskCard
-                  task={activeTask}
-                  draggable={false}
-                  isDragging={true}
-                />
-              </div>
+              <TaskCard
+                task={activeTask}
+                draggable={false}
+                isDragging={true}
+              />
             ) : null}
           </DragOverlay>
         </DndContext>

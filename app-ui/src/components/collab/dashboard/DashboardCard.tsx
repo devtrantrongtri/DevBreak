@@ -73,10 +73,11 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
       extra={cardExtra}
       loading={loading}
     >
-      <div className="card-content" style={{ 
-        maxHeight: '400px', 
-        overflowY: 'auto',
-        padding: '20px'
+      <div className="card-content" style={{
+        maxHeight: title === 'Task Board' ? 'none' : '400px',
+        overflowY: title === 'Task Board' ? 'visible' : 'auto',
+        padding: title === 'Task Board' ? '0' : '20px',
+        position: 'relative' // Ensure proper positioning context
       }}>
         {children}
       </div>

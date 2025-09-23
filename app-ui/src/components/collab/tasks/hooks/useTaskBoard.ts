@@ -75,7 +75,7 @@ export const useTaskBoard = (): UseTaskBoardReturn => {
     if (!task || task.status === newStatus) return;
 
     // Optimistic update
-    setTasks(prev => prev.map(t => 
+    setTasks(prev => prev.map(t =>
       t.id === taskId ? { ...t, status: newStatus } : t
     ));
 
@@ -83,7 +83,7 @@ export const useTaskBoard = (): UseTaskBoardReturn => {
       await updateTask(taskId, { status: newStatus });
     } catch (err) {
       // Revert on error
-      setTasks(prev => prev.map(t => 
+      setTasks(prev => prev.map(t =>
         t.id === taskId ? { ...t, status: task.status } : t
       ));
       throw err;
