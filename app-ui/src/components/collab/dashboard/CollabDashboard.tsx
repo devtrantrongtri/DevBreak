@@ -16,6 +16,7 @@ import CreateDailyModal from '../dailies/CreateDailyModal';
 import ProjectMembersModal from '../projects/ProjectMembersModal';
 import VisibilityWrapper from '../common/VisibilityWrapper';
 import ProjectVisibilityControl from './ProjectVisibilityControl';
+import ProjectMeetings from '../../meetings/ProjectMeetings';
 
 const { Title } = Typography;
 
@@ -25,6 +26,15 @@ const DASHBOARD_SECTIONS: DashboardSection[] = [
     id: 'daily-reports',
     title: 'Daily Reports',
     component: DailyReportsSection,
+    roles: ['PM', 'BC', 'DEV', 'QC'],
+    span: 1
+  },
+  {
+    id: 'meetings',
+    title: 'Project Meetings',
+    component: ({ projectId, projectName }: { projectId: string; projectName?: string }) => (
+      <ProjectMeetings projectId={projectId} projectName={projectName} />
+    ),
     roles: ['PM', 'BC', 'DEV', 'QC'],
     span: 1
   },
@@ -188,6 +198,8 @@ const CollabDashboard: React.FC = () => {
                   }}
                 >
                   <SectionComponent
+                    projectId={currentProject?.id}
+                    projectName={currentProject?.name}
                     onTaskCreate={handleTaskCreate}
                     onTaskEdit={handleTaskEdit}
                     onCreateDaily={handleDailyCreate}

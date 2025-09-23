@@ -197,6 +197,14 @@ export class ComponentsService {
         isBuiltIn: true,
       },
       {
+        key: 'meetings',
+        name: 'Project Meetings',
+        description: 'Video meetings and conference calls for project team',
+        category: 'communication',
+        defaultRoles: null,
+        isBuiltIn: true,
+      },
+      {
         key: 'summary',
         name: 'Project Summary',
         description: 'Project overview, metrics, and key indicators',
