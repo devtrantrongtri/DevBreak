@@ -69,7 +69,8 @@ export default function GroupMembersPage() {
       console.log(`[GroupMembers] Group details loaded:`, response);
 
       setGroup(response);
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error & { response?: { data?: unknown }; message?: string };
       console.error('Error fetching group details:', error);
       console.error('Error response:', error?.response?.data);
       message.error(`Failed to load group details: ${error?.message || 'Unknown error'}`);

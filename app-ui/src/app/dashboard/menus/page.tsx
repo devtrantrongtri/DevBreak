@@ -95,7 +95,8 @@ const MenusPage: React.FC = () => {
 
       // Refresh user data to update sidebar menu
       await refreshUserData();
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error;
       console.error('Update menu name error:', error);
       message.error(error.message || 'Cập nhật tên menu thất bại');
     } finally {
@@ -124,7 +125,8 @@ const MenusPage: React.FC = () => {
 
       // Refresh user data to update sidebar menu icons
       await refreshUserData();
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error;
       console.error('Update menu error:', error);
       message.error(error.message || 'Cập nhật menu thất bại');
     } finally {

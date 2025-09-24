@@ -89,7 +89,8 @@ const GroupPermissionsPage: React.FC = () => {
       await apiClient.assignGroupPermissions(groupId, selectedPermissions);
       setOriginalPermissions([...selectedPermissions]);
       message.success('Cập nhật phân quyền thành công');
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error & { response?: { data?: { message?: string } } };
       const errorMessage = error?.response?.data?.message || 'Cập nhật phân quyền thất bại';
       message.error(errorMessage);
       console.error('Error updating permissions:', error);

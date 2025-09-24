@@ -61,8 +61,6 @@ const TaskPreviewPopover: React.FC<TaskPreviewPopoverProps> = ({
         tags: [],
         isActive: true
       } as Task);
-    } catch (error) {
-      console.error('Failed to load task:', error);
     } finally {
       setLoading(false);
     }

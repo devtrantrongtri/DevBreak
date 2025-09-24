@@ -238,7 +238,7 @@ const UserDetailsPage: React.FC = () => {
                 renderItem={(group) => (
                   <List.Item
                     actions={canManageGroups ? [
-                      <Tooltip title="Xóa khỏi nhóm">
+                      <Tooltip key="remove" title="Xóa khỏi nhóm">
                         <Button
                           type="text"
                           danger

@@ -15,25 +15,20 @@ import {
   Divider,
   Space,
   Tag,
-  List,
-  Timeline,
   Tabs,
-  Descriptions,
 } from 'antd';
 import {
   UserOutlined,
   EditOutlined,
   SaveOutlined,
-  CameraOutlined,
-  HistoryOutlined,
   SafetyCertificateOutlined,
   PhoneOutlined,
   MailOutlined,
   CalendarOutlined,
   TeamOutlined,
+  CameraOutlined,
 } from '@ant-design/icons';
 import { useAuth } from '@/contexts/AuthContext';
-import ActivityLog from '@/components/common/ActivityLog';
 import { apiClient } from '@/lib/api';
 import { UserResponse } from '@/types/api';
 import ChangePasswordModal from '@/components/profile/ChangePasswordModal';
@@ -49,7 +44,6 @@ const ProfilePage: React.FC = () => {
   const [fetchingDetails, setFetchingDetails] = useState(true);
   const [changePasswordVisible, setChangePasswordVisible] = useState(false);
   const { user, refreshUserData } = useAuth();
-  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -79,14 +73,15 @@ const ProfilePage: React.FC = () => {
     fetchUserDetails();
   }, [user, form]);
 
-  const handleSave = async (values: any) => {
+  const handleSave = async (values: Record<string, unknown>) => {
     try {
       setLoading(true);
       await apiClient.updateUser(user!.id, values);
       message.success('Cập nhật thông tin thành công');
       await refreshUserData();
       setEditing(false);
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error & { response?: { data?: { message?: string } } };
       const errorMessage = error?.response?.data?.message || 'Không thể cập nhật thông tin';
       message.error(errorMessage);
     } finally {

@@ -1,11 +1,8 @@
 'use client';
 
 import { Card, Statistic, Row, Col, Progress, Typography } from 'antd';
-import { 
-  EyeOutlined, 
-  EditOutlined, 
-  DeleteOutlined, 
-  PlusOutlined,
+import {
+  EyeOutlined,
   CheckCircleOutlined,
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
@@ -44,11 +41,7 @@ const ActivityLogStats: React.FC<ActivityLogStatsProps> = ({
     ? Math.round(((statusStats.success || 0) / totalActivities) * 100)
     : 0;
 
-  const getTopResources = () => {
-    return Object.entries(resourceStats)
-      .sort(([,a], [,b]) => b - a)
-      .slice(0, 3);
-  };
+
 
   return (
     <Row gutter={16} style={{ marginBottom: 16 }}>

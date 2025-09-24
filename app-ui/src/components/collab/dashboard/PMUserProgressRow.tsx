@@ -1,28 +1,24 @@
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  Card, 
-  Avatar, 
-  Typography, 
-  Space, 
-  Tag, 
-  Button, 
-  Popover,
-  Tooltip,
+import {
+  Card,
+  Avatar,
+  Typography,
+  Space,
+  Tag,
+  Button,
   Row,
   Col
 } from 'antd';
-import { 
-  UpOutlined, 
-  DownOutlined, 
+import {
+  UpOutlined,
+  DownOutlined,
   UserOutlined,
-  ExclamationCircleOutlined,
-  CheckCircleOutlined,
-  ClockCircleOutlined
+  ExclamationCircleOutlined
 } from '@ant-design/icons';
 import { addDays } from 'date-fns';
-import { UserProgressData, ChartType, ViewMode, Task } from '@/types/collab';
+import { UserProgressData, ChartType, ViewMode } from '@/types/collab';
 import PMUserChart from './PMUserChart';
 import TaskPreviewPopover from './TaskPreviewPopover';
 
@@ -76,8 +72,10 @@ const PMUserProgressRow: React.FC<PMUserProgressRowProps> = ({
   const parseTaskMentions = (text: string) => {
     if (!text) return text;
 
-    // Remove HTML tags first and extract task mentions
-    const cleanText = text.replace(/<[^>]*>/g, '');
+    // Create a temporary div to properly decode HTML entities
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = text;
+    const cleanText = tempDiv.textContent || tempDiv.innerText || '';
 
     // Simple regex for @mentions
     const taskRegex = /@([A-Z]+-\d+|NEW-\d+|TASK-\d+)/g;
@@ -179,10 +177,10 @@ const PMUserProgressRow: React.FC<PMUserProgressRowProps> = ({
   );
 
   return (
-    <Card 
+    <Card
       className={`pm-user-progress-row ${hasBlockers ? 'has-blockers' : ''}`}
-      bodyStyle={{ padding: 0 }}
-      style={{ 
+      styles={{ body: { padding: 0 } }}
+      style={{
         marginBottom: 16,
         border: hasBlockers ? '1px solid #ff7875' : undefined,
         borderLeft: hasBlockers ? '4px solid #ff4d4f' : undefined
@@ -192,14 +190,66 @@ const PMUserProgressRow: React.FC<PMUserProgressRowProps> = ({
         {/* Left Chart Section - 30% */}
         <Col span={7} className="chart-section">
           <div style={{ padding: 16, height: '100%' }}>
-            <PMUserChart
-              userProgress={userProgress}
-              chartType={chartType}
-              isRangeMode={isRangeMode}
-              dateRange={dateRange}
-              selectedDate={userCurrentDate}
-              height={viewMode === 'single-row' ? 88 : 120}
-            />
+            {/* Chart with fallback */}
+            <div style={{ position: 'relative', height: viewMode === 'single-row' ? 88 : 120 }}>
+              <PMUserChart
+                userProgress={userProgress}
+                chartType={chartType}
+                isRangeMode={isRangeMode}
+                dateRange={dateRange}
+                height={viewMode === 'single-row' ? 88 : 120}
+              />
+
+              {/* Simple fallback chart */}
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                background: '#fafafa',
+                borderRadius: 4,
+                zIndex: -1,
+                border: '1px solid #f0f0f0'
+              }}>
+                {/* Simple progress circle */}
+                <div style={{
+                  width: 60,
+                  height: 60,
+                  borderRadius: '50%',
+                  background: `conic-gradient(#52c41a 0deg ${completionPercentage * 3.6}deg, #f0f0f0 ${completionPercentage * 3.6}deg 360deg)`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: 8
+                }}>
+                  <div style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: '50%',
+                    background: '#fff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <Text strong style={{ fontSize: 12 }}>
+                      {completionPercentage}%
+                    </Text>
+                  </div>
+                </div>
+
+                {/* Task stats */}
+                <div style={{ textAlign: 'center' }}>
+                  <Text type="secondary" style={{ fontSize: 10 }}>
+                    {taskStats.done}/{taskStats.total} tasks
+                  </Text>
+                </div>
+              </div>
+            </div>
           </div>
         </Col>
 

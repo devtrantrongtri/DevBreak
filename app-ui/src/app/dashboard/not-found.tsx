@@ -4,6 +4,7 @@ import React from 'react';
 import { Result, Button, Space } from 'antd';
 import { HomeOutlined, ArrowLeftOutlined, SearchOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const DashboardNotFound: React.FC = () => {
   const router = useRouter();
@@ -64,14 +65,14 @@ const DashboardNotFound: React.FC = () => {
               </a>
             </li>
             <li>
-              <a href="/dashboard/users" style={{ color: '#0969da' }}>
+              <Link href="/dashboard/users" style={{ color: '#0969da' }}>
                 Quản lý người dùng
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="/dashboard/groups" style={{ color: '#0969da' }}>
+              <Link href="/dashboard/groups" style={{ color: '#0969da' }}>
                 Quản lý nhóm
-              </a>
+              </Link>
             </li>
             <li>
               <a href="/dashboard/menus" style={{ color: '#0969da' }}>

@@ -53,7 +53,8 @@ const DailyList: React.FC<DailyListProps> = ({
       console.log('[DailyList] Dailies data:', response);
 
       setDailies(response);
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error & { response?: { status?: number; data?: unknown }; message?: string };
       console.error('Failed to load dailies:', error);
       console.error('Error details:', {
         status: error?.response?.status,

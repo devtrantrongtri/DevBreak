@@ -28,7 +28,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { PMDashboardData, ViewMode, ChartType } from '@/types/collab';
 import { useProject } from '@/contexts/ProjectContext';
 import { apiClient } from '@/lib/api';
-import { generateMockPMDashboardData } from '@/data/mockPMDashboardData';
+// import { generateMockPMDashboardData } from '@/data/mockPMDashboardData';
 import PMUserProgressRow from './PMUserProgressRow';
 import PMProjectStats from './PMProjectStats';
 import VisibilityWrapper from '../common/VisibilityWrapper';
@@ -52,28 +52,29 @@ const PMDailyReportDashboard: React.FC<PMDailyReportDashboardProps> = ({
   let currentProject = null;
   let projectFromContext = false;
 
-  try {
-    const { currentProject: contextProject } = useProject();
-    currentProject = contextProject;
+  // Always call useProject hook, but handle the case where context might not be available
+  const projectContext = useProject();
+
+  if (projectContext?.currentProject) {
+    currentProject = projectContext.currentProject;
     projectFromContext = true;
-  } catch (error) {
-    // useProject not available, use props
-    if (propProjectId) {
-      currentProject = {
-        id: propProjectId,
-        name: propProjectName || 'Unknown Project',
-        code: propProjectId,
-        status: 'active' as const,
-        createdBy: '',
-        createdAt: '',
-        updatedAt: '',
-        creator: { id: '', displayName: '', email: '' },
-        members: [],
-        memberCount: 0,
-        isActive: true
-      };
-    }
+  } else if (propProjectId) {
+    // Fallback to props if context is not available
+    currentProject = {
+      id: propProjectId,
+      name: propProjectName || 'Unknown Project',
+      code: propProjectId,
+      status: 'active' as const,
+      createdBy: '',
+      createdAt: '',
+      updatedAt: '',
+      creator: { id: '', displayName: '', email: '' },
+      members: [],
+      memberCount: 0,
+      isActive: true
+    };
   }
+
   const [loading, setLoading] = useState(false);
   const [dashboardData, setDashboardData] = useState<PMDashboardData | null>(null);
   
@@ -114,8 +115,8 @@ const PMDailyReportDashboard: React.FC<PMDailyReportDashboardProps> = ({
       // Fallback to mock data only in development
       if (process.env.NODE_ENV === 'development') {
         console.warn('🔄 Using mock data as fallback in development mode');
-        const mockData = generateMockPMDashboardData(projectId, format(date, 'yyyy-MM-dd'));
-        setDashboardData(mockData);
+        // const mockData = generateMockPMDashboardData(projectId, format(date, 'yyyy-MM-dd'));
+        setDashboardData(null);
       }
     } finally {
       setLoading(false);
@@ -144,8 +145,8 @@ const PMDailyReportDashboard: React.FC<PMDailyReportDashboardProps> = ({
     }
   };
 
-  const handleRangeChange = (dates: [Dayjs, Dayjs] | null) => {
-    if (dates && dates.length === 2) {
+  const handleRangeChange = (dates: [Dayjs | null, Dayjs | null] | null, _dateStrings: [string, string]) => {
+    if (dates && dates.length === 2 && dates[0] && dates[1]) {
       setDateRange([dates[0].toDate(), dates[1].toDate()]);
     } else {
       setDateRange(null);

@@ -7,12 +7,11 @@ import {
   LineChart, 
   Line, 
   PieChart, 
-  Pie, 
+  Pie,
   Cell,
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
+  XAxis,
+  YAxis,
+  Tooltip,
   ResponsiveContainer,
   Area,
   AreaChart
@@ -24,7 +23,6 @@ interface PMUserChartProps {
   chartType: ChartType;
   isRangeMode: boolean;
   dateRange: [Date, Date] | null;
-  selectedDate: Date;
   height: number;
 }
 
@@ -33,7 +31,6 @@ const PMUserChart: React.FC<PMUserChartProps> = ({
   chartType,
   isRangeMode,
   dateRange,
-  selectedDate,
   height
 }) => {
   const { taskStats, progressHistory } = userProgress;
@@ -159,8 +156,8 @@ const PMUserChart: React.FC<PMUserChartProps> = ({
                 />
                 <YAxis hide />
                 <Tooltip 
-                  formatter={(value: any, name: string) => [
-                    `${value}%`, 
+                  formatter={(value: number) => [
+                    `${value}%`,
                     'Tiến độ'
                   ]}
                   labelFormatter={(label) => `Ngày: ${label}`}
@@ -188,7 +185,7 @@ const PMUserChart: React.FC<PMUserChartProps> = ({
                   tick={{ fontSize: 10 }}
                 />
                 <Tooltip 
-                  formatter={(value: any) => [`${value}%`, 'Tiến độ']}
+                  formatter={(value: number) => [`${value}%`, 'Tiến độ']}
                 />
                 <Bar 
                   dataKey="progress" 
@@ -212,7 +209,7 @@ const PMUserChart: React.FC<PMUserChartProps> = ({
               />
               <YAxis hide />
               <Tooltip 
-                formatter={(value: any) => [`${value}`, 'Tasks hoàn thành']}
+                formatter={(value: number) => [`${value}`, 'Tasks hoàn thành']}
                 labelFormatter={(label) => `Ngày: ${label}`}
               />
               <Line
@@ -240,12 +237,12 @@ const PMUserChart: React.FC<PMUserChartProps> = ({
                 paddingAngle={2}
                 dataKey="value"
               >
-                {chartData.map((entry: any, index: number) => (
+                {chartData.map((entry: { name: string; value: number; color: string }, index: number) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
               <Tooltip 
-                formatter={(value: any, name: string) => [`${value}`, name]}
+                formatter={(value: number, name: string) => [`${value}`, name]}
               />
             </PieChart>
           </ResponsiveContainer>
@@ -263,14 +260,14 @@ const PMUserChart: React.FC<PMUserChartProps> = ({
               />
               <YAxis hide />
               <Tooltip 
-                formatter={(value: any, name: string) => [`${value}`, 'Tasks']}
+                formatter={(value: number) => [`${value}`, 'Tasks']}
               />
               <Bar 
                 dataKey="value" 
                 fill={COLORS.primary}
                 radius={[4, 4, 0, 0]}
               >
-                {chartData.map((entry: any, index: number) => (
+                {chartData.map((entry: { name: string; value: number; color: string }, index: number) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Bar>
@@ -283,11 +280,51 @@ const PMUserChart: React.FC<PMUserChartProps> = ({
     }
   };
 
-  return (
-    <div className="pm-user-chart">
-      {renderChart()}
-    </div>
-  );
+  // Debug logging
+  console.log('[PMUserChart] Rendering with:', {
+    chartType,
+    isRangeMode,
+    taskStats,
+    progressHistory: progressHistory?.length || 0,
+    chartData: getChartData()
+  });
+
+  try {
+    return (
+      <div className="pm-user-chart" style={{ width: '100%', height: height, minHeight: height }}>
+        {renderChart()}
+      </div>
+    );
+  } catch (error) {
+    console.error('[PMUserChart] Error rendering chart:', error);
+
+    // Fallback simple chart
+    const completionPercentage = taskStats.total > 0
+      ? Math.round((taskStats.done / taskStats.total) * 100)
+      : 0;
+
+    return (
+      <div style={{
+        width: '100%',
+        height: height,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#f5f5f5',
+        borderRadius: 4,
+        border: '1px solid #d9d9d9'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: 18, fontWeight: 'bold', color: '#1890ff' }}>
+            {completionPercentage}%
+          </div>
+          <div style={{ fontSize: 10, color: '#666' }}>
+            {taskStats.done}/{taskStats.total}
+          </div>
+        </div>
+      </div>
+    );
+  }
 };
 
 export default PMUserChart;

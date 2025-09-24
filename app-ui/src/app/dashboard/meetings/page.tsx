@@ -7,8 +7,6 @@ import MeetingsList from '@/components/meetings/MeetingsList';
 import MeetingCalendar from '@/components/meetings/MeetingCalendar';
 import { useRouter } from 'next/navigation';
 
-const { TabPane } = Tabs;
-
 const MeetingsPage: React.FC = () => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('calendar');

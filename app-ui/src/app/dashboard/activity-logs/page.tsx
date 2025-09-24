@@ -1,14 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { 
-  Card, 
-  Typography, 
-  message, 
-  Space, 
+import {
+  Card,
+  Typography,
+  message,
+  Space,
   Button,
   Breadcrumb,
-  Spin,
 } from 'antd';
 import { 
   ReloadOutlined, 
@@ -39,7 +38,7 @@ const ActivityLogsPage: React.FC = () => {
     try {
       // Prepare params object for API call
       const currentFilters = newFilters || filters;
-      const apiParams: any = {
+      const apiParams: Record<string, unknown> = {
         page: page || pagination.current,
         limit: pageSize || pagination.pageSize,
       };

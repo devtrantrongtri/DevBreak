@@ -127,7 +127,7 @@ export const useWebRTC = ({
       console.error('❌ Error starting local stream:', error);
       onError?.(`Failed to start camera/microphone: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
-  }, []); // ✅ Loại bỏ dependencies không ổn định
+  }, [createPeerConnection, onError]);
 
   const stopLocalStream = useCallback(() => {
     if (localStream) {
@@ -143,7 +143,7 @@ export const useWebRTC = ({
       originalStreamRef.current = null;
     }
     setIsScreenSharing(false);
-  }, []); // ✅ Sử dụng ref thay vì state dependency
+  }, [localStream]);
 
   const toggleVideo = useCallback(() => {
     // Sử dụng ref để tránh dependency
@@ -212,7 +212,7 @@ export const useWebRTC = ({
       console.error('❌ Error starting screen share:', error);
       onError?.(`Failed to start screen sharing: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
-  }, []); // ✅ Loại bỏ dependencies
+  }, [localStream, onError, stopScreenShare]);
 
   const stopScreenShare = useCallback(async () => {
     try {
@@ -241,7 +241,7 @@ export const useWebRTC = ({
       console.error('❌ Error stopping screen share:', error);
       onError?.(`Failed to stop screen sharing: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
-  }, []); // ✅ Loại bỏ onError dependency
+  }, [onError]);
 
   const createOffer = useCallback(async (): Promise<WebRTCOffer> => {
     const pc = createPeerConnection();
@@ -264,7 +264,7 @@ export const useWebRTC = ({
       console.error('❌ Error creating offer:', error);
       throw new Error(`Failed to create offer: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
-  }, []); // ✅ Loại bỏ createPeerConnection dependency
+  }, [createPeerConnection]);
 
   const createAnswer = useCallback(async (offer: WebRTCOffer): Promise<WebRTCAnswer> => {
     const pc = createPeerConnection();
@@ -285,7 +285,7 @@ export const useWebRTC = ({
       console.error('❌ Error creating answer:', error);
       throw new Error(`Failed to create answer: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
-  }, []); // ✅ Loại bỏ createPeerConnection dependency
+  }, [createPeerConnection]);
 
   const setRemoteDescription = useCallback(async (answer: WebRTCAnswer): Promise<void> => {
     const pc = peerConnectionRef.current;
@@ -346,7 +346,7 @@ export const useWebRTC = ({
     return () => {
       cleanup();
     };
-  }, []); // ✅ Chỉ chạy một lần khi unmount
+  }, [cleanup]);
 
   return {
     localStream,

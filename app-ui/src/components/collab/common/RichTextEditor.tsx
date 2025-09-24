@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Button, Space, Tooltip, Divider, Modal, Tag, Typography, Avatar, Spin } from 'antd';
 import {
   BoldOutlined,
@@ -165,10 +165,147 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   const handleInput = () => {
     if (editorRef.current && onChange) {
+      // Clean up broken task mentions before passing content
+      cleanupBrokenTaskMentions();
+
+      // Clean up all orphaned styling
+      cleanupAllStyling();
+
+      // Reset cursor styling to prevent inheriting task mention styles
+      resetCursorStyling();
+
       const content = editorRef.current.innerHTML;
       onChange(content);
     }
   };
+
+  const resetCursorStyling = useCallback(() => {
+    if (!editorRef.current) return;
+
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+
+      // If cursor is at the end of a task mention, ensure new text doesn't inherit styling
+      if (range.collapsed) {
+        const container = range.startContainer;
+        const parent = container.parentElement;
+
+        // If we're inside or right after a task mention, move cursor outside
+        if (parent && (parent.classList.contains('task-mention') ||
+                      parent.style.backgroundColor ||
+                      parent.style.color === 'rgb(22, 119, 255)')) {
+
+          // Create a new text node after the styled element
+          const textNode = document.createTextNode('');
+          parent.parentNode?.insertBefore(textNode, parent.nextSibling);
+
+          // Move cursor to the new text node
+          range.setStart(textNode, 0);
+          range.setEnd(textNode, 0);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+      }
+    }
+  }, []);
+
+  const cleanupBrokenTaskMentions = useCallback(() => {
+    if (!editorRef.current) return;
+
+    // Find all task mention spans
+    const taskMentions = editorRef.current.querySelectorAll('.task-mention');
+
+    taskMentions.forEach((mention) => {
+      const text = mention.textContent || '';
+
+      // If the mention doesn't start with @ anymore, convert it back to plain text
+      if (!text.startsWith('@')) {
+        const textNode = document.createTextNode(text);
+        mention.parentNode?.replaceChild(textNode, mention);
+      }
+      // If the mention is just @ without any task identifier, remove the styling
+      else if (text === '@' || text.length <= 1) {
+        const textNode = document.createTextNode(text);
+        mention.parentNode?.replaceChild(textNode, mention);
+      }
+      // If the mention is incomplete (like @T or @TA), convert to plain text
+      else if (text.length < 4 || !text.match(/@[A-Z0-9-]+/)) {
+        const textNode = document.createTextNode(text);
+        mention.parentNode?.replaceChild(textNode, mention);
+      }
+    });
+
+    // Clean up any orphaned styling that might remain
+    const styledSpans = editorRef.current.querySelectorAll('span[style*="background"]');
+    styledSpans.forEach((span) => {
+      const text = span.textContent || '';
+      // If it's not a proper task mention, remove styling
+      if (!span.classList.contains('task-mention') && !span.hasAttribute('data-task-id')) {
+        const textNode = document.createTextNode(text);
+        span.parentNode?.replaceChild(textNode, span);
+      }
+    });
+
+    // Clean up font tags with task mention colors
+    const fontTags = editorRef.current.querySelectorAll('font[color="#1677ff"], font[color="rgb(22, 119, 255)"]');
+    fontTags.forEach((font) => {
+      const text = font.textContent || '';
+      const textNode = document.createTextNode(text);
+      font.parentNode?.replaceChild(textNode, font);
+    });
+
+    // Clean up spans with task mention background colors
+    const backgroundSpans = editorRef.current.querySelectorAll('span[style*="background-color: rgb(230, 244, 255)"]');
+    backgroundSpans.forEach((span) => {
+      if (!span.classList.contains('task-mention') && !span.hasAttribute('data-task-id')) {
+        const text = span.textContent || '';
+        const textNode = document.createTextNode(text);
+        span.parentNode?.replaceChild(textNode, span);
+      }
+    });
+  }, []);
+
+  const cleanupAllStyling = useCallback(() => {
+    if (!editorRef.current) return;
+
+    // Remove all font tags with task mention colors
+    const fontTags = editorRef.current.querySelectorAll('font');
+    fontTags.forEach((font) => {
+      const color = font.getAttribute('color');
+      if (color === '#1677ff' || color === 'rgb(22, 119, 255)') {
+        const text = font.textContent || '';
+        const textNode = document.createTextNode(text);
+        font.parentNode?.replaceChild(textNode, font);
+      }
+    });
+
+    // Remove all spans with task mention styling that aren't proper task mentions
+    const allSpans = editorRef.current.querySelectorAll('span');
+    allSpans.forEach((span) => {
+      const hasTaskMentionClass = span.classList.contains('task-mention');
+      const hasTaskId = span.hasAttribute('data-task-id');
+      const hasTaskMentionStyling = span.style.backgroundColor === 'rgb(230, 244, 255)' ||
+                                   span.style.color === 'rgb(22, 119, 255)' ||
+                                   span.style.backgroundColor.includes('230, 244, 255');
+
+      // If it has task mention styling but isn't a proper task mention, remove styling
+      if (hasTaskMentionStyling && !hasTaskMentionClass && !hasTaskId) {
+        const text = span.textContent || '';
+        const textNode = document.createTextNode(text);
+        span.parentNode?.replaceChild(textNode, span);
+      }
+    });
+  }, []);
+
+  const handlePaste = useCallback((_e: React.ClipboardEvent) => {
+    // Allow the paste to happen first, then clean up
+    setTimeout(() => {
+      cleanupBrokenTaskMentions();
+      cleanupAllStyling();
+      resetCursorStyling();
+    }, 0);
+  }, [cleanupBrokenTaskMentions, cleanupAllStyling, resetCursorStyling]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     // Handle @ mentions for tasks
@@ -215,6 +352,39 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     if (e.key === 'Enter' && !e.shiftKey && !showAutocomplete) {
       e.preventDefault();
       document.execCommand('insertHTML', false, '<br><br>');
+    }
+
+    // Handle backspace/delete to close autocomplete and cleanup
+    if (showAutocomplete && (e.key === 'Backspace' || e.key === 'Delete')) {
+      setTimeout(() => {
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0);
+          const textNode = range.startContainer;
+          if (textNode.nodeType === Node.TEXT_NODE) {
+            const text = textNode.textContent || '';
+            const atIndex = text.lastIndexOf('@');
+            // If @ is deleted or no @ found, close autocomplete
+            if (atIndex === -1) {
+              setShowAutocomplete(false);
+              setAutocompleteQuery('');
+            } else {
+              // Update query if @ still exists
+              const query = text.substring(atIndex + 1);
+              setAutocompleteQuery(query);
+            }
+          }
+        }
+      }, 0);
+    }
+
+    // Handle general backspace/delete for cleanup (even when autocomplete is not showing)
+    if (e.key === 'Backspace' || e.key === 'Delete') {
+      setTimeout(() => {
+        cleanupBrokenTaskMentions();
+        cleanupAllStyling();
+        resetCursorStyling();
+      }, 0);
     }
 
     // Close autocomplete on Escape or Space
@@ -393,6 +563,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         contentEditable={!disabled}
         onInput={handleInput}
         onKeyDown={handleKeyDown}
+        onPaste={handlePaste}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         style={{

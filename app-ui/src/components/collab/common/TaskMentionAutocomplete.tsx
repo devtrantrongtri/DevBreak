@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { List, Avatar, Typography, Spin, Empty, Tag, Card, Space, Badge, Modal, Button } from 'antd';
-import { CheckSquareOutlined, UserOutlined, ClockCircleOutlined, FlagOutlined, CheckCircleOutlined, SyncOutlined, ExclamationCircleOutlined, EyeOutlined } from '@ant-design/icons';
-import { Task, TASK_STATUSES, TASK_PRIORITIES } from '@/types/collab';
+import { List, Typography, Spin, Empty } from 'antd';
+
+import { Task, TASK_STATUSES } from '@/types/collab';
 import { useProject } from '@/contexts/ProjectContext';
 import { apiClient } from '@/lib/api';
 import './TaskMentionAutocomplete.scss';
@@ -109,35 +109,9 @@ const TaskMentionAutocomplete: React.FC<TaskMentionAutocompleteProps> = ({
     return colors[status as keyof typeof colors] || '#d9d9d9';
   };
 
-  const getPriorityColor = (priority: string) => {
-    const colors = {
-      low: '#52c41a',
-      medium: '#faad14',
-      high: '#ff7a45',
-      critical: '#ff4d4f'
-    };
-    return colors[priority as keyof typeof colors] || '#faad14';
-  };
 
-  const getStatusIcon = (status: string) => {
-    const icons = {
-      todo: <ExclamationCircleOutlined style={{ color: '#d9d9d9' }} />,
-      in_process: <SyncOutlined spin style={{ color: '#1890ff' }} />,
-      ready_for_qc: <ClockCircleOutlined style={{ color: '#faad14' }} />,
-      done: <CheckCircleOutlined style={{ color: '#52c41a' }} />
-    };
-    return icons[status as keyof typeof icons] || <ExclamationCircleOutlined style={{ color: '#d9d9d9' }} />;
-  };
 
-  const getPriorityIcon = (priority: string) => {
-    return <FlagOutlined style={{ color: getPriorityColor(priority) }} />;
-  };
 
-  const formatDueDate = (dueDate: string | Date | null) => {
-    if (!dueDate) return 'Không có deadline';
-    const date = new Date(dueDate);
-    return date.toLocaleDateString('vi-VN');
-  };
 
 
 

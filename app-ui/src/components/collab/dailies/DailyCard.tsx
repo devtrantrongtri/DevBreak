@@ -5,8 +5,9 @@ import { Card, Typography, Space, Avatar, Tag, Divider } from 'antd';
 import { UserOutlined, CalendarOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { Daily } from '@/types/collab';
 import dayjs from 'dayjs';
+import '../common/RichTextEditor.scss';
 
-const { Text, Paragraph } = Typography;
+const { Text } = Typography;
 
 interface DailyCardProps {
   daily: Daily;
@@ -14,14 +15,28 @@ interface DailyCardProps {
   compact?: boolean;
 }
 
-const DailyCard: React.FC<DailyCardProps> = ({ 
-  daily, 
+const DailyCard: React.FC<DailyCardProps> = ({
+  daily,
   showDate = false,
-  compact = false 
+  compact = false
 }) => {
   const hasBlockers = daily.blockers && daily.blockers.trim().length > 0;
   const isToday = dayjs(daily.reportDate).isSame(dayjs(), 'day');
   const isYesterday = dayjs(daily.reportDate).isSame(dayjs().subtract(1, 'day'), 'day');
+
+  // Handle task mention clicks
+  const handleTaskMentionClick = (event: React.MouseEvent) => {
+    const target = event.target as HTMLElement;
+    if (target.classList.contains('task-mention')) {
+      const taskId = target.getAttribute('data-task-id');
+      if (taskId) {
+        console.log('Task mention clicked:', taskId);
+        // TODO: Open task details modal or navigate to task
+        // For now, just prevent default behavior
+        event.preventDefault();
+      }
+    }
+  };
 
   const getDateLabel = () => {
     if (isToday) return 'Hôm nay';
@@ -82,16 +97,15 @@ const DailyCard: React.FC<DailyCardProps> = ({
             <Text type="secondary" style={{ fontSize: '11px', fontWeight: 500 }}>
               HÔM QUA:
             </Text>
-            <Paragraph 
-              style={{ 
-                margin: '4px 0 0 0', 
+            <div
+              style={{
+                margin: '4px 0 0 0',
                 fontSize: compact ? '12px' : '13px',
                 lineHeight: 1.4
               }}
-              ellipsis={compact ? { rows: 2 } : false}
-            >
-              {daily.yesterday}
-            </Paragraph>
+              onClick={handleTaskMentionClick}
+              dangerouslySetInnerHTML={{ __html: daily.yesterday }}
+            />
           </div>
         )}
 
@@ -101,16 +115,15 @@ const DailyCard: React.FC<DailyCardProps> = ({
             <Text type="secondary" style={{ fontSize: '11px', fontWeight: 500 }}>
               HÔM NAY:
             </Text>
-            <Paragraph 
-              style={{ 
-                margin: '4px 0 0 0', 
+            <div
+              style={{
+                margin: '4px 0 0 0',
                 fontSize: compact ? '12px' : '13px',
                 lineHeight: 1.4
               }}
-              ellipsis={compact ? { rows: 2 } : false}
-            >
-              {daily.today}
-            </Paragraph>
+              onClick={handleTaskMentionClick}
+              dangerouslySetInnerHTML={{ __html: daily.today }}
+            />
           </div>
         )}
 
@@ -126,17 +139,16 @@ const DailyCard: React.FC<DailyCardProps> = ({
                 <ExclamationCircleOutlined style={{ marginRight: 4 }} />
                 VƯỚNG MẮC:
               </Text>
-              <Paragraph 
-                style={{ 
-                  margin: '4px 0 0 0', 
+              <div
+                style={{
+                  margin: '4px 0 0 0',
                   fontSize: compact ? '12px' : '13px',
                   lineHeight: 1.4,
                   color: '#ff4d4f'
                 }}
-                ellipsis={compact ? { rows: 2 } : false}
-              >
-                {daily.blockers}
-              </Paragraph>
+                onClick={handleTaskMentionClick}
+                dangerouslySetInnerHTML={{ __html: daily.blockers }}
+              />
             </div>
           </>
         )}

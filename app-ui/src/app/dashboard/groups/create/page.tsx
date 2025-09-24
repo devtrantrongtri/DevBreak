@@ -70,7 +70,8 @@ const CreateGroupPage: React.FC = () => {
       
       message.success('Group created successfully');
       router.push('/dashboard/groups');
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error & { response?: { data?: { message?: string } } };
       const errorMessage = error?.response?.data?.message || 'Failed to create group';
       message.error(errorMessage);
       console.error('Error creating group:', error);
@@ -79,7 +80,7 @@ const CreateGroupPage: React.FC = () => {
     }
   };
 
-  const validateCode = (_: any, value: string) => {
+  const validateCode = (_: unknown, value: string) => {
     if (!value) {
       return Promise.reject(new Error('Group code is required'));
     }

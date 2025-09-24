@@ -9,21 +9,15 @@ import {
   Progress,
   Typography,
   Space,
-  Tag,
-  List,
-  Avatar,
-  Divider,
 } from 'antd';
 import {
   UserOutlined,
   TeamOutlined,
   CheckCircleOutlined,
-  CloseCircleOutlined,
   TrophyOutlined,
   CalendarOutlined,
   BarChartOutlined,
   PieChartOutlined,
-  EditOutlined,
 } from '@ant-design/icons';
 import {
   BarChart,
@@ -36,34 +30,27 @@ import {
   PieChart,
   Pie,
   Cell,
-  LineChart,
-  Line,
   Area,
   AreaChart,
 } from 'recharts';
 import { apiClient } from '@/lib/api';
 import { UserResponse, GroupResponse } from '@/types/api';
-import { DashboardStats, GrowthData, ActivityLog as ActivityLogType } from '@/types/dashboard';
-import ActivityLog from '@/components/common/ActivityLog';
+import { DashboardStats, GrowthData } from '@/types/dashboard';
 import { useTranslation } from 'react-i18next';
 
-const { Title, Text } = Typography;
-
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+const { Text } = Typography;
 
 interface SystemChartsProps {
   onViewUsers?: () => void;
   onViewGroups?: () => void;
 }
 
-const SystemCharts: React.FC<SystemChartsProps> = ({ onViewUsers, onViewGroups }) => {
+const SystemCharts: React.FC<SystemChartsProps> = () => {
   const [users, setUsers] = useState<UserResponse[]>([]);
   const [groups, setGroups] = useState<GroupResponse[]>([]);
   const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
   const [growthData, setGrowthData] = useState<GrowthData[]>([]);
-  const [recentActivities, setRecentActivities] = useState<ActivityLogType[]>([]);
   const [loading, setLoading] = useState(true);
-  const { t } = useTranslation();
 
   useEffect(() => {
     fetchData();
@@ -72,18 +59,16 @@ const SystemCharts: React.FC<SystemChartsProps> = ({ onViewUsers, onViewGroups }
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [usersResponse, groupsResponse, statsResponse, growthResponse, activitiesResponse] = await Promise.all([
+      const [usersResponse, groupsResponse, statsResponse, growthResponse] = await Promise.all([
         apiClient.getUsers(),
         apiClient.getGroups(),
         apiClient.getDashboardStats(),
         apiClient.getUserGrowthData(6),
-        apiClient.getRecentActivities(10),
       ]);
       setUsers(usersResponse);
       setGroups(groupsResponse);
       setDashboardStats(statsResponse);
       setGrowthData(growthResponse);
-      setRecentActivities(activitiesResponse);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {

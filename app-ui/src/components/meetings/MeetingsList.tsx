@@ -217,14 +217,14 @@ const MeetingsList: React.FC<MeetingsListProps> = ({
             </Button>
           </Tooltip>
         ),
-        <Tooltip title="Copy Room ID">
+        <Tooltip key="copy" title="Copy Room ID">
           <Button
             icon={<CopyOutlined />}
             onClick={() => handleCopyRoomId(meeting.roomId)}
             size="small"
           />
         </Tooltip>,
-        <Tooltip title="Edit Meeting">
+        <Tooltip key="edit" title="Edit Meeting">
           <Button
             icon={<EditOutlined />}
             onClick={() => {
@@ -234,7 +234,7 @@ const MeetingsList: React.FC<MeetingsListProps> = ({
             size="small"
           />
         </Tooltip>,
-        <Tooltip title="Delete Meeting">
+        <Tooltip key="delete" title="Delete Meeting">
           <Button
             danger
             icon={<DeleteOutlined />}

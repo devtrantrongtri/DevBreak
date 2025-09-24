@@ -15,8 +15,6 @@ const { Title, Paragraph } = Typography;
 const Dashboard: React.FC = () => {
   const { user, permissions } = useAuth();
   const router = useRouter();
-  const { t } = useTranslation();
-  const [refreshKey, setRefreshKey] = React.useState(0);
   const [showDebug, setShowDebug] = React.useState(false);
 
   // Toggle debug panel with Ctrl+Shift+D
@@ -43,7 +41,6 @@ const Dashboard: React.FC = () => {
       {/* Biểu đồ hệ thống */}
       <div style={{ marginBottom: 12 }}>
         <SystemCharts
-          key={refreshKey}
           onViewUsers={() => router.push('/dashboard/users')}
           onViewGroups={() => router.push('/dashboard/groups')}
         />

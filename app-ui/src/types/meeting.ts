@@ -42,7 +42,7 @@ export interface Meeting {
   maxParticipants?: number;
   allowRecording?: boolean;
   isRecurring?: boolean;
-  settings?: Record<string, any>;
+  settings?: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
   
@@ -67,7 +67,7 @@ export interface MeetingParticipant {
   isMuted: boolean;
   canSpeak: boolean;
   canChat: boolean;
-  connectionInfo?: Record<string, any>;
+  connectionInfo?: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
   
@@ -81,7 +81,7 @@ export interface MeetingMessage {
   senderId: string;
   content: string;
   type: 'text' | 'file' | 'image' | 'system' | 'reaction';
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   isEdited: boolean;
   isDeleted: boolean;
   replyToId?: string;
@@ -108,7 +108,7 @@ export interface CreateMeetingDto {
   allowRecording?: boolean;
   isRecurring?: boolean;
   participantIds?: string[];
-  settings?: Record<string, any>;
+  settings?: Record<string, unknown>;
 }
 
 export interface UpdateMeetingDto {
@@ -121,7 +121,7 @@ export interface UpdateMeetingDto {
   isAudioEnabled?: boolean;
   isChatEnabled?: boolean;
   isRecording?: boolean;
-  settings?: Record<string, any>;
+  settings?: Record<string, unknown>;
 }
 
 export interface JoinMeetingDto {
@@ -142,7 +142,7 @@ export interface UpdateParticipantDto {
 export interface SendMessageDto {
   content: string;
   type?: 'text' | 'file' | 'image' | 'system' | 'reaction';
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   replyToId?: string;
 }
 
