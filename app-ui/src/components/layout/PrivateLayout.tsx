@@ -144,7 +144,7 @@ const PrivateLayout: React.FC<PrivateLayoutProps> = ({ children }) => {
         flexShrink: 0
       }}>
         <h2 style={{ color: 'white', margin: 0 }}>
-          {collapsed && !isMobile ? 'L' : 'Logo'}
+          {collapsed && !isMobile ? 'C' : 'Collab'}
         </h2>
       </div>
 

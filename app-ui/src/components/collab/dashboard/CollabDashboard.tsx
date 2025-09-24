@@ -19,6 +19,8 @@ import VisibilityWrapper from '../common/VisibilityWrapper';
 import ProjectVisibilityControl from './ProjectVisibilityControl';
 import ProjectMeetings from '../../meetings/ProjectMeetings';
 import PMDailyReportWrapper from './PMDailyReportWrapper';
+import CreateProjectModal from '../projects/CreateProjectModal';
+import PermissionBasedComponent from '../common/PermissionBasedComponent';
 
 const { Title } = Typography;
 
@@ -62,6 +64,7 @@ const CollabDashboard: React.FC = () => {
   const [editTaskModalVisible, setEditTaskModalVisible] = useState(false);
   const [createDailyModalVisible, setCreateDailyModalVisible] = useState(false);
   const [membersModalVisible, setMembersModalVisible] = useState(false);
+  const [createProjectModalVisible, setCreateProjectModalVisible] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [taskInitialStatus, setTaskInitialStatus] = useState<'todo' | 'in_process' | 'ready_for_qc' | 'done'>('todo');
   const [taskRefreshTrigger, setTaskRefreshTrigger] = useState(0);
@@ -157,16 +160,31 @@ const CollabDashboard: React.FC = () => {
         </div>
 
         <Space>
-          <ProjectVisibilityControl />
-
           <RoleBasedComponent allowedRoles={['PM']} showFallback={false}>
             <Button
+              type="default"
               icon={<TeamOutlined />}
               onClick={() => setMembersModalVisible(true)}
             >
               Quản lý thành viên
             </Button>
           </RoleBasedComponent>
+        </Space>
+
+        <Space>
+          <PermissionBasedComponent requiredPermissions={['collab.projects.create']}>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => setCreateProjectModalVisible(true)}
+            >
+              Tạo dự án mới
+            </Button>
+          </PermissionBasedComponent>
+        </Space>
+
+        <Space>
+          <ProjectVisibilityControl />
 
           <RoleBasedComponent allowedRoles={['PM', 'BC']} showFallback={false}>
             <Button
@@ -284,6 +302,15 @@ const CollabDashboard: React.FC = () => {
           projectId={currentProject.id}
         />
       )}
+
+      <CreateProjectModal
+        visible={createProjectModalVisible}
+        onCancel={() => setCreateProjectModalVisible(false)}
+        onSuccess={() => {
+          setCreateProjectModalVisible(false);
+          // Modal will auto close and refresh projects
+        }}
+      />
     </div>
   );
 };
