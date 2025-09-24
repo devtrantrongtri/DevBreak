@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In, Not, IsNull } from 'typeorm';
+import { Repository, In, Not, IsNull, DataSource } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User, Group, Permission, Menu } from '../entities';
+import { seedCollabData } from '../collab/seed-collab-data';
+import { SeedGroupsUsersService } from './seed-groups-users.service';
+import { MenusService } from '../menus/menus.service';
 
 @Injectable()
 export class SeedingService {
@@ -15,16 +18,19 @@ export class SeedingService {
     private permissionRepository: Repository<Permission>,
     @InjectRepository(Menu)
     private menuRepository: Repository<Menu>,
+    private dataSource: DataSource,
+    private seedGroupsUsersService: SeedGroupsUsersService,
+    private menusService: MenusService,
   ) {}
 
   async seedAll(): Promise<void> {
     console.log('🌱 Starting database seeding...');
-    
+
     await this.seedPermissions();
-    await this.seedMenus();
-    await this.seedGroups();
-    await this.seedUsers();
-    
+    await this.menusService.seedMenus();
+    await this.seedGroupsUsersService.seedGroupsAndUsers();
+    await seedCollabData(this.dataSource);
+
     console.log('✅ Database seeding completed!');
   }
 
@@ -79,106 +85,7 @@ export class SeedingService {
     }
   }
 
-  private async seedMenus(): Promise<void> {
-    console.log('🍽️ Seeding menus...');
 
-    // Clear existing menus to avoid duplicates (handle foreign key constraints)
-    try {
-      // Delete child menus first (those with parent)
-      await this.menuRepository.delete({ parent: Not(IsNull()) });
-      // Then delete parent menus
-      await this.menuRepository.delete({ parent: IsNull() });
-      console.log('  ✓ Cleared existing menus');
-    } catch (error) {
-      console.log('  ⚠️ Error clearing menus, continuing with seeding...');
-    }
-
-    // Get permissions for menu binding
-    const dashboardPermission = await this.permissionRepository.findOne({ where: { code: 'dashboard.view' } });
-    const systemPermission = await this.permissionRepository.findOne({ where: { code: 'system.manage' } });
-    const usersPermission = await this.permissionRepository.findOne({ where: { code: 'system.users.manage' } });
-    const groupsPermission = await this.permissionRepository.findOne({ where: { code: 'system.groups.manage' } });
-    const menusPermission = await this.permissionRepository.findOne({ where: { code: 'system.menus.manage' } });
-
-    // Create root menus - simplified structure
-    const rootMenus = [
-      {
-        name: 'Dashboard',
-        path: '/dashboard',
-        icon: 'DashboardOutlined',
-        order: 1,
-        permission: dashboardPermission,
-      },
-      {
-        name: 'System Management',
-        path: '/system',
-        icon: 'SettingOutlined',
-        order: 2,
-        permission: systemPermission,
-      },
-    ];
-
-    const createdMenus = new Map<string, Menu>();
-
-    // Create root menus
-    for (const menuData of rootMenus) {
-      const menu = this.menuRepository.create({
-        name: menuData.name,
-        path: menuData.path,
-        icon: menuData.icon,
-        order: menuData.order,
-        permission: menuData.permission!,
-      });
-      const savedMenu = await this.menuRepository.save(menu);
-      createdMenus.set(menuData.path, savedMenu);
-      console.log(`  ✓ Created menu: ${menuData.name}`);
-    }
-
-    // Create child menus under System Management
-    const systemParent = createdMenus.get('/system');
-    if (systemParent) {
-      const childMenus = [
-        {
-          name: 'Users',
-          path: '/dashboard/users',
-          icon: 'UserOutlined',
-          order: 1,
-          permission: usersPermission,
-          parent: systemParent,
-        },
-        {
-          name: 'Groups',
-          path: '/dashboard/groups',
-          icon: 'TeamOutlined',
-          order: 2,
-          permission: groupsPermission,
-          parent: systemParent,
-        },
-        {
-          name: 'Menus',
-          path: '/dashboard/menus',
-          icon: 'MenuOutlined',
-          order: 3,
-          permission: menusPermission,
-          parent: systemParent,
-        },
-      ];
-
-      // Create child menus
-      for (const childMenuData of childMenus) {
-        const menu = this.menuRepository.create({
-          name: childMenuData.name,
-          path: childMenuData.path,
-          icon: childMenuData.icon,
-          order: childMenuData.order,
-          permission: childMenuData.permission!,
-          parent: childMenuData.parent,
-        });
-        await this.menuRepository.save(menu);
-        console.log(`  ✓ Created child menu: ${childMenuData.name}`);
-      }
-    }
-  }
 
   private async seedGroups(): Promise<void> {
     console.log('👥 Seeding groups...');

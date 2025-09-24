@@ -38,18 +38,11 @@ export default function LoginPage() {
     }
   };
 
-  const fillDemoCredentials = (type: 'admin' | 'user') => {
-    if (type === 'admin') {
-      form.setFieldsValue({
-        email: 'admin@example.com',
-        password: 'admin123',
-      });
-    } else {
-      form.setFieldsValue({
-        email: 'user@example.com',
-        password: 'user123',
-      });
-    }
+  const fillDemoCredentials = (username: string, password: string) => {
+    form.setFieldsValue({
+      email: username,
+      password: password,
+    });
   };
 
   return (
@@ -91,7 +84,7 @@ export default function LoginPage() {
                 label="Email"
                 rules={[
                   { required: true, message: 'Please input your email!' },
-                  { type: 'email', message: 'Please enter a valid email!' }
+                  // { type: 'email', message: 'Please enter a valid email!' }
                 ]}
               >
                 <Input 
@@ -125,26 +118,55 @@ export default function LoginPage() {
             </Form>
 
             <Divider>Demo Accounts</Divider>
-            
+
             <Alert
               message="Demo Credentials"
               description={
                 <div>
                   <p>Use these demo accounts to test the application:</p>
-                  <Space direction="vertical" style={{ width: '100%' }}>
-                    <Button 
-                      size="small" 
-                      onClick={() => fillDemoCredentials('admin')}
+                  <Space direction="vertical" style={{ width: '100%' }} size="small">
+                    <Button
+                      size="small"
+                      onClick={() => fillDemoCredentials('admin', 'admin123')}
                       block
+                      type="primary"
                     >
-                      Admin Account (Full Access)
+                      👑 Admin - Full Access
                     </Button>
-                    <Button 
-                      size="small" 
-                      onClick={() => fillDemoCredentials('user')}
+                    <Button
+                      size="small"
+                      onClick={() => fillDemoCredentials('pm_john', 'pm123')}
                       block
                     >
-                      User Account (Limited Access)
+                      📊 PM John - Project Manager
+                    </Button>
+                    <Button
+                      size="small"
+                      onClick={() => fillDemoCredentials('dev_alice', 'dev123')}
+                      block
+                    >
+                      💻 Alice - Developer
+                    </Button>
+                    <Button
+                      size="small"
+                      onClick={() => fillDemoCredentials('qc_bob', 'qc123')}
+                      block
+                    >
+                      🔍 Bob - Quality Control
+                    </Button>
+                    <Button
+                      size="small"
+                      onClick={() => fillDemoCredentials('ba_carol', 'ba123')}
+                      block
+                    >
+                      📋 Carol - Business Analyst
+                    </Button>
+                    <Button
+                      size="small"
+                      onClick={() => fillDemoCredentials('viewer_dave', 'viewer123')}
+                      block
+                    >
+                      👁️ Dave - Viewer Only
                     </Button>
                   </Space>
                 </div>

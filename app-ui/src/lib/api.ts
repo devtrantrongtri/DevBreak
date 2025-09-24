@@ -13,7 +13,7 @@ import {
   SeedResponse,
 } from '@/types/api';
 import { PaginatedActivityLogs } from '@/types/activity-logs';
-import { Project } from '@/types/collab';
+import { Project, PMDashboardData, UserProgressData, Task } from '@/types/collab';
 import { 
   Meeting, 
   CreateMeetingDto, 
@@ -23,7 +23,7 @@ import {
   SendMessageDto 
 } from '@/types/meeting';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 class ApiClient {
   private baseURL: string;
@@ -410,6 +410,71 @@ class ApiClient {
   // Project Members API
   async getProjectMembers(projectId: string): Promise<any[]> {
     return this.request(`/collab/projects/${projectId}/members`);
+  }
+
+  // PM Dashboard API
+  async getPMDashboardData(projectId: string, reportDate: string): Promise<PMDashboardData> {
+    return this.request(`/collab/projects/${projectId}/pm-dashboard?date=${reportDate}`);
+  }
+
+  async getUserProgressData(projectId: string, userId: string, reportDate: string): Promise<UserProgressData> {
+    return this.request(`/collab/projects/${projectId}/users/${userId}/progress?date=${reportDate}`);
+  }
+
+  async getTaskPreview(taskId: string): Promise<Task> {
+    return this.request(`/collab/tasks/${taskId}/preview`);
+  }
+
+  // Task Management API
+  async searchTasks(projectId: string, query: string): Promise<Task[]> {
+    return this.request(`/collab/projects/${projectId}/tasks/search?q=${encodeURIComponent(query)}`);
+  }
+
+  async getTasksByMention(projectId: string, taskIds: string[]): Promise<Task[]> {
+    return this.request(`/collab/projects/${projectId}/tasks/batch`, {
+      method: 'POST',
+      data: { taskIds }
+    });
+  }
+
+  // Daily Reports API with Rich Text
+  async createDaily(dailyData: {
+    projectId: string;
+    reportDate: string;
+    yesterday: string;
+    today: string;
+    blockers?: string;
+  }): Promise<Daily> {
+    return this.request('/collab/dailies', {
+      method: 'POST',
+      data: dailyData
+    });
+  }
+
+  async updateDaily(dailyId: string, dailyData: Partial<Daily>): Promise<Daily> {
+    return this.request(`/collab/dailies/${dailyId}`, {
+      method: 'PUT',
+      data: dailyData
+    });
+  }
+
+  async getDailyByDate(projectId: string, userId: string, reportDate: string): Promise<Daily | null> {
+    return this.request(`/collab/dailies/user/${userId}?projectId=${projectId}&date=${reportDate}`);
+  }
+
+  // Component Visibility API for PM Dashboard
+  async updateComponentVisibility(
+    projectId: string,
+    componentKey: string,
+    visibilityData: {
+      isVisibleToAll: boolean;
+      visibleRoles?: string[];
+    }
+  ): Promise<any> {
+    return this.request(`/collab/projects/${projectId}/component-visibility/${componentKey}`, {
+      method: 'PUT',
+      data: visibilityData
+    });
   }
 
   // Meetings endpoints

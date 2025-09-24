@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
 import { User, MenuItem } from '@/types/auth';
 import { apiClient } from '@/lib/api';
-import { message, App } from 'antd';
+import { App } from 'antd';
 
 interface AuthContextType {
   user: User | null;
@@ -59,9 +59,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Get menu tree after login
       await refreshUserData();
       
-      message.success('Login successful!');
+      messageApi.success('Login successful!');
     } catch (error) {
-      message.error(error instanceof Error ? error.message : 'Login failed');
+      messageApi.error(error instanceof Error ? error.message : 'Login failed');
       throw error;
     } finally {
       setIsLoading(false);

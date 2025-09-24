@@ -3,6 +3,7 @@
 import React from 'react';
 import { ConfigProvider, App } from 'antd';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { ProjectProvider } from '@/contexts/ProjectContext';
 import I18nProvider from './I18nProvider';
 
 interface AppProviderProps {
@@ -22,7 +23,9 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       >
         <App>
           <AuthProvider>
-            {children}
+            <ProjectProvider>
+              {children}
+            </ProjectProvider>
           </AuthProvider>
         </App>
       </ConfigProvider>

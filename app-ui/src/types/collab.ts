@@ -111,6 +111,51 @@ export interface SummaryData {
   recentActivities: TaskActivity[];
 }
 
+// PM Dashboard Types
+export interface UserProgressData {
+  userId: string;
+  user: {
+    id: string;
+    displayName: string;
+    email: string;
+    avatar?: string;
+  };
+  role: 'PM' | 'BC' | 'DEV' | 'QC';
+  dailyReport?: Daily;
+  taskStats: {
+    todo: number;
+    in_process: number;
+    ready_for_qc: number;
+    done: number;
+    total: number;
+    completedToday: number;
+    overdue: number;
+  };
+  progressHistory: {
+    date: string;
+    completed: number;
+    total: number;
+    throughput: number;
+  }[];
+  recentTasks: Task[];
+}
+
+export interface PMDashboardData {
+  projectId: string;
+  reportDate: string;
+  teamProgress: UserProgressData[];
+  projectStats: {
+    totalTasks: number;
+    completedTasks: number;
+    overdueTasks: number;
+    blockedUsers: number;
+    averageThroughput: number;
+  };
+}
+
+export type ChartType = 'progress' | 'throughput' | 'status' | 'workload';
+export type ViewMode = 'single-row' | 'grid' | 'compact';
+
 // DTOs
 export interface CreateProjectDto {
   name: string;

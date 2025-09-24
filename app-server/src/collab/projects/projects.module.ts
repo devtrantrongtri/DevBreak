@@ -5,11 +5,14 @@ import { ProjectsController } from './projects.controller';
 import { Project } from './entities/project.entity';
 import { ProjectMember } from './entities/project-member.entity';
 import { ProjectComponentVisibility } from './entities/project-component-visibility.entity';
+import { Daily } from '../dailies/entities/daily.entity';
+import { Task } from '../tasks/entities/task.entity';
+import { User } from '../../entities/User';
 import { AuthModule } from '../../auth/auth.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Project, ProjectMember, ProjectComponentVisibility]),
+    TypeOrmModule.forFeature([Project, ProjectMember, ProjectComponentVisibility, Daily, Task, User]),
     AuthModule
   ],
   controllers: [ProjectsController],

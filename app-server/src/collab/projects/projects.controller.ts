@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
   UseGuards,
   Request,
   ParseUUIDPipe,
@@ -178,6 +179,32 @@ export class ProjectsController {
     @Request() req: any,
   ) {
     return this.projectsService.getComponentVisibility(id, req.user.userId);
+  }
+
+  // Task search endpoint for mentions
+  @Get(':id/tasks/search')
+  @RequirePermissions('collab.tasks.view')
+  @ApiOperation({ summary: 'Search tasks in project for mentions' })
+  @ApiResponse({ status: 200, description: 'Tasks found' })
+  searchTasks(
+    @Param('id', ParseUUIDPipe) projectId: string,
+    @Query('q') query: string,
+    @Request() req: any,
+  ) {
+    return this.projectsService.searchTasks(projectId, req.user.userId, query);
+  }
+
+  // PM Dashboard endpoint
+  @Get(':id/pm-dashboard')
+  @RequirePermissions('collab.projects.view')
+  @ApiOperation({ summary: 'Get PM dashboard data for project' })
+  @ApiResponse({ status: 200, description: 'PM dashboard data retrieved' })
+  getPMDashboard(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Query('date') date?: string,
+    @Request() req?: any,
+  ) {
+    return this.projectsService.getPMDashboard(id, req.user.userId, date);
   }
 
   // Admin route to get all projects

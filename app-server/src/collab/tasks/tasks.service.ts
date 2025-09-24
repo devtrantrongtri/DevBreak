@@ -86,6 +86,46 @@ export class TasksService {
     return task;
   }
 
+  async findTaskByIdOrCode(idOrCode: string, userId: string): Promise<Task> {
+    let task: Task | null = null;
+
+    // Try to find by UUID first
+    if (idOrCode.length === 36 && idOrCode.includes('-')) {
+      task = await this.taskRepository.findOne({
+        where: { id: idOrCode },
+        relations: ['assignee', 'creator', 'project'],
+      });
+    }
+
+    // If not found by UUID, try to find by title (since we don't have code field)
+    if (!task) {
+      task = await this.taskRepository.findOne({
+        where: { title: idOrCode },
+        relations: ['assignee', 'creator', 'project'],
+      });
+    }
+
+    // If still not found, try partial title match
+    if (!task) {
+      task = await this.taskRepository
+        .createQueryBuilder('task')
+        .leftJoinAndSelect('task.assignee', 'assignee')
+        .leftJoinAndSelect('task.creator', 'creator')
+        .leftJoinAndSelect('task.project', 'project')
+        .where('task.title ILIKE :title', { title: `%${idOrCode}%` })
+        .getOne();
+    }
+
+    if (!task) {
+      throw new NotFoundException('Không tìm thấy task');
+    }
+
+    // Check if user is member of the project
+    await this.checkProjectMembership(task.projectId, userId);
+
+    return task;
+  }
+
   async update(id: string, updateTaskDto: UpdateTaskDto, userId: string): Promise<Task> {
     const task = await this.findOne(id, userId);
 

@@ -6,9 +6,8 @@ import { SaveOutlined, CalendarOutlined } from '@ant-design/icons';
 import { useProject } from '@/contexts/ProjectContext';
 import { CreateDailyDto, UpdateDailyDto, Daily } from '@/types/collab';
 import { apiClient } from '@/lib/api';
+import RichTextEditor from '../common/RichTextEditor';
 import dayjs from 'dayjs';
-
-const { TextArea } = Input;
 
 interface DailyFormProps {
   selectedDate?: string;
@@ -174,12 +173,14 @@ const DailyForm: React.FC<DailyFormProps> = ({
             { required: true, message: 'Vui lòng nhập công việc đã làm' }
           ]}
         >
-          <TextArea
-            rows={3}
-            placeholder="Mô tả chi tiết công việc đã hoàn thành hôm qua..."
-            maxLength={1000}
-            showCount
-          />
+          <Form.Item name="yesterday" noStyle>
+            <RichTextEditor
+              placeholder="Mô tả chi tiết công việc đã hoàn thành hôm qua... (Có thể mention task bằng @TASK-001)"
+              minHeight={100}
+              maxHeight={200}
+              enableTaskMentions={true}
+            />
+          </Form.Item>
         </Form.Item>
 
         <Form.Item
@@ -189,24 +190,28 @@ const DailyForm: React.FC<DailyFormProps> = ({
             { required: true, message: 'Vui lòng nhập kế hoạch công việc' }
           ]}
         >
-          <TextArea
-            rows={3}
-            placeholder="Kế hoạch công việc cụ thể cho hôm nay..."
-            maxLength={1000}
-            showCount
-          />
+          <Form.Item name="today" noStyle>
+            <RichTextEditor
+              placeholder="Kế hoạch công việc cụ thể cho hôm nay... (Có thể mention task bằng @TASK-002)"
+              minHeight={100}
+              maxHeight={200}
+              enableTaskMentions={true}
+            />
+          </Form.Item>
         </Form.Item>
 
         <Form.Item
           label="Vướng mắc, khó khăn"
           name="blockers"
         >
-          <TextArea
-            rows={2}
-            placeholder="Những khó khăn cần hỗ trợ, vướng mắc cần giải quyết..."
-            maxLength={500}
-            showCount
-          />
+          <Form.Item name="blockers" noStyle>
+            <RichTextEditor
+              placeholder="Những khó khăn cần hỗ trợ, vướng mắc cần giải quyết..."
+              minHeight={80}
+              maxHeight={150}
+              enableTaskMentions={true}
+            />
+          </Form.Item>
         </Form.Item>
 
         <Form.Item style={{ marginBottom: 0 }}>
