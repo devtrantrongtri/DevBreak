@@ -8,6 +8,9 @@ import { UpdateProjectDto } from './dto/update-project.dto';
 import { AddMemberDto, UpdateMemberRoleDto, BulkAddMembersDto } from './dto/manage-members.dto';
 import { UpdateComponentVisibilityDto, ResetComponentVisibilityDto, AddComponentDto } from './dto/component-visibility.dto';
 import { ProjectComponentVisibility } from './entities/project-component-visibility.entity';
+import { Daily } from '../dailies/entities/daily.entity';
+import { Task } from '../tasks/entities/task.entity';
+import { User } from '../../entities/User';
 
 @Injectable()
 export class ProjectsService {
@@ -18,6 +21,12 @@ export class ProjectsService {
     private memberRepository: Repository<ProjectMember>,
     @InjectRepository(ProjectComponentVisibility)
     private visibilityRepository: Repository<ProjectComponentVisibility>,
+    @InjectRepository(Daily)
+    private dailyRepository: Repository<Daily>,
+    @InjectRepository(Task)
+    private taskRepository: Repository<Task>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
 
   async create(createProjectDto: CreateProjectDto, createdBy: string): Promise<Project> {
@@ -317,5 +326,178 @@ export class ProjectsService {
     // This method now delegates to ComponentsService
     // The actual implementation should be moved to ComponentsService.addToProject()
     throw new BadRequestException('Use ComponentsService.addToProject() instead');
+  }
+
+  async searchTasks(projectId: string, userId: string, query: string): Promise<Task[]> {
+    // Check if user is member of the project
+    await this.checkProjectMembership(projectId, userId);
+
+    if (!query || query.trim().length < 1) {
+      return [];
+    }
+
+    const searchQuery = query.trim().toLowerCase();
+
+    const tasks = await this.taskRepository
+      .createQueryBuilder('task')
+      .leftJoinAndSelect('task.assignee', 'assignee')
+      .leftJoinAndSelect('task.creator', 'creator')
+      .where('task.project_id = :projectId', { projectId })
+      .andWhere(
+        '(LOWER(task.code) LIKE :search OR LOWER(task.title) LIKE :search OR LOWER(task.description) LIKE :search)',
+        { search: `%${searchQuery}%` }
+      )
+      .orderBy('task.created_at', 'DESC')
+      .limit(10)
+      .getMany();
+
+    return tasks;
+  }
+
+  async getPMDashboard(projectId: string, userId: string, date?: string): Promise<any> {
+    // Check if user has access to project
+    await this.checkProjectMembership(projectId, userId);
+
+    const reportDate = date || new Date().toISOString().split('T')[0];
+
+    // Get project members with their roles
+    const members = await this.memberRepository.find({
+      where: { projectId, isActive: true },
+      relations: ['user'],
+    });
+
+    // Get daily reports for the date
+    const dailies = await this.dailyRepository.find({
+      where: { projectId, date: reportDate },
+      relations: ['user'],
+    });
+
+    // Get tasks for the project
+    const tasks = await this.taskRepository.find({
+      where: { projectId },
+      relations: ['assignee', 'creator'],
+    });
+
+    // Build team progress data
+    const teamProgress = await Promise.all(
+      members.map(async (member) => {
+        const userTasks = tasks.filter(t => t.assignedTo === member.userId);
+        const userDaily = dailies.find(d => d.userId === member.userId);
+
+        // Calculate task statistics
+        const taskStats = {
+          todo: userTasks.filter(t => t.status === 'todo').length,
+          in_process: userTasks.filter(t => t.status === 'in_process').length,
+          ready_for_qc: userTasks.filter(t => t.status === 'ready_for_qc').length,
+          done: userTasks.filter(t => t.status === 'done').length,
+          total: userTasks.length,
+          completedToday: userTasks.filter(t =>
+            t.status === 'done' &&
+            new Date(t.updatedAt).toISOString().split('T')[0] === reportDate
+          ).length,
+          overdue: userTasks.filter(t =>
+            t.dueDate &&
+            new Date(t.dueDate) < new Date(reportDate) &&
+            t.status !== 'done'
+          ).length,
+        };
+
+        // Generate progress history (last 7 days)
+        const progressHistory: any[] = [];
+        for (let i = 6; i >= 0; i--) {
+          const historyDate = new Date();
+          historyDate.setDate(historyDate.getDate() - i);
+          const dateStr = historyDate.toISOString().split('T')[0];
+
+          const completedByDate = userTasks.filter(t =>
+            t.status === 'done' &&
+            t.updatedAt <= historyDate
+          ).length;
+
+          progressHistory.push({
+            date: dateStr,
+            completed: completedByDate,
+            total: userTasks.length,
+            throughput: i === 0 ? taskStats.completedToday :
+              Math.floor(Math.random() * 3), // Mock throughput for historical data
+          });
+        }
+
+        return {
+          userId: member.userId,
+          user: {
+            id: member.user.id,
+            displayName: member.user.displayName,
+            email: member.user.email,
+            avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${member.user.displayName}`,
+          },
+          role: member.role,
+          dailyReport: userDaily ? {
+            id: userDaily.id,
+            userId: userDaily.userId,
+            projectId: userDaily.projectId,
+            reportDate: userDaily.date,
+            yesterday: userDaily.yesterday,
+            today: userDaily.today,
+            blockers: userDaily.blockers,
+            createdAt: userDaily.createdAt.toISOString(),
+            updatedAt: userDaily.updatedAt.toISOString(),
+            user: {
+              id: member.user.id,
+              displayName: member.user.displayName,
+              email: member.user.email,
+            },
+          } : null,
+          taskStats,
+          progressHistory,
+          recentTasks: userTasks.slice(0, 5).map(task => ({
+            id: task.id,
+            code: `TASK-${task.id.slice(-3).toUpperCase()}`,
+            projectId: task.projectId,
+            title: task.title,
+            description: task.description,
+            status: task.status,
+            priority: task.priority,
+            assigneeId: task.assignedTo,
+            assignee: task.assignee ? {
+              id: task.assignee.id,
+              displayName: task.assignee.displayName,
+              email: task.assignee.email,
+              avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${task.assignee.displayName}`,
+            } : null,
+            createdBy: task.createdBy,
+            createdAt: task.createdAt.toISOString(),
+            updatedAt: task.updatedAt.toISOString(),
+            dueDate: task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : null,
+            estimatedHours: task.estimatedHours,
+            actualHours: task.actualHours,
+            tags: [],
+            isActive: true,
+          })),
+        };
+      })
+    );
+
+    // Calculate project statistics
+    const projectStats = {
+      totalTasks: tasks.length,
+      completedTasks: tasks.filter(t => t.status === 'done').length,
+      overdueTasks: tasks.filter(t =>
+        t.dueDate &&
+        new Date(t.dueDate) < new Date(reportDate) &&
+        t.status !== 'done'
+      ).length,
+      blockedUsers: dailies.filter(d => d.blockers && d.blockers.trim().length > 0).length,
+      averageThroughput: teamProgress.reduce((sum, tp) =>
+        sum + tp.taskStats.completedToday, 0
+      ) / Math.max(teamProgress.length, 1),
+    };
+
+    return {
+      projectId,
+      reportDate,
+      teamProgress,
+      projectStats,
+    };
   }
 }

@@ -1,0 +1,315 @@
+// PM Daily Report Dashboard Styles
+
+.pm-daily-report-dashboard {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f5f5f5;
+
+  // Header Section
+  .dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background: white;
+    border-bottom: 1px solid #f0f0f0;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+
+    .header-left {
+      flex: 1;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      .ant-select {
+        min-width: 120px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 16px;
+      align-items: stretch;
+
+      .header-controls {
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+    }
+  }
+
+  // Date Navigation
+  .date-navigation {
+    padding: 12px 24px;
+    background: white;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    @media (max-width: 768px) {
+      padding: 12px 16px;
+      
+      .ant-space {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+    }
+  }
+
+  // Dashboard Content
+  .dashboard-content {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+
+    @media (max-width: 768px) {
+      padding: 16px;
+    }
+
+    .loading-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 200px;
+    }
+  }
+
+  // Team Progress Container
+  .team-progress-container {
+    &.view-mode-single-row {
+      .pm-user-progress-row {
+        .ant-row {
+          min-height: 120px;
+        }
+      }
+    }
+
+    &.view-mode-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+      gap: 16px;
+
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    &.view-mode-compact {
+      .pm-user-progress-row {
+        .ant-row {
+          min-height: 80px;
+        }
+
+        .chart-section {
+          .pm-user-chart {
+            height: 60px;
+          }
+        }
+
+        .info-section {
+          .daily-content {
+            .daily-section {
+              margin-bottom: 6px;
+
+              .ant-typography {
+                margin-bottom: 4px !important;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Empty State
+  .pm-dashboard-empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 300px;
+  }
+}
+
+// PM User Progress Row
+.pm-user-progress-row {
+  transition: all 0.3s ease;
+  
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  &.has-blockers {
+    border-left: 4px solid #ff4d4f !important;
+    
+    .ant-card-body {
+      background: linear-gradient(90deg, rgba(255, 77, 79, 0.02) 0%, transparent 30%);
+    }
+  }
+
+  // Chart Section
+  .chart-section {
+    border-right: 1px solid #f0f0f0;
+    background: #fafafa;
+
+    .pm-user-chart {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  // Info Section
+  .info-section {
+    .user-header {
+      .ant-avatar {
+        border: 2px solid white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .ant-tag {
+        font-weight: 500;
+        border: none;
+      }
+    }
+
+    .daily-report-content {
+      .no-daily-report {
+        padding: 16px;
+        text-align: center;
+        background: #f9f9f9;
+        border-radius: 6px;
+        border: 1px dashed #d9d9d9;
+      }
+
+      .daily-content {
+        .daily-section {
+          margin-bottom: 12px;
+
+          &.blockers {
+            padding: 8px 12px;
+            background: rgba(255, 77, 79, 0.05);
+            border-radius: 6px;
+            border-left: 3px solid #ff4d4f;
+          }
+
+          .ant-typography {
+            margin-bottom: 6px !important;
+          }
+        }
+      }
+    }
+
+    .task-stats {
+      .ant-tag {
+        margin-bottom: 4px;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .ant-row {
+      flex-direction: column;
+    }
+
+    .chart-section {
+      border-right: none;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .info-section {
+      .user-header {
+        .ant-space {
+          flex-direction: column;
+          align-items: flex-start !important;
+          width: 100% !important;
+        }
+      }
+    }
+  }
+}
+
+// PM Project Stats
+.pm-project-stats {
+  .ant-card-head {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-bottom: none;
+
+    .ant-card-head-title {
+      color: white;
+    }
+  }
+
+  .ant-progress-circle {
+    .ant-progress-text {
+      font-weight: 600;
+    }
+  }
+
+  .ant-statistic {
+    .ant-statistic-title {
+      font-size: 12px;
+      font-weight: 500;
+      color: #666;
+    }
+
+    .ant-statistic-content {
+      font-weight: 600;
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 1200px) {
+  .pm-daily-report-dashboard {
+    .team-progress-container.view-mode-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .pm-daily-report-dashboard {
+    height: 100vh;
+    
+    .dashboard-content {
+      padding: 12px;
+    }
+
+    .pm-user-progress-row {
+      .chart-section,
+      .info-section {
+        padding: 12px !important;
+      }
+    }
+  }
+}
+
+// Dark mode support (if needed)
+@media (prefers-color-scheme: dark) {
+  .pm-daily-report-dashboard {
+    background: #141414;
+
+    .dashboard-header,
+    .date-navigation {
+      background: #1f1f1f;
+      border-color: #303030;
+    }
+
+    .chart-section {
+      background: #262626;
+    }
+
+    .no-daily-report {
+      background: #262626 !important;
+      border-color: #434343 !important;
+    }
+  }
+}

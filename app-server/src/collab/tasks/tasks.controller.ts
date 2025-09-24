@@ -56,6 +56,15 @@ export class TasksController {
     return this.tasksService.findOne(id, req.user.userId);
   }
 
+  @Get(':id/preview')
+  @RequirePermissions('collab.tasks.view')
+  @ApiOperation({ summary: 'Lấy preview task cho mentions' })
+  @ApiResponse({ status: 200, description: 'Preview task' })
+  getPreview(@Param('id') id: string, @Request() req: any) {
+    // Support both UUID and task code
+    return this.tasksService.findTaskByIdOrCode(id, req.user.userId);
+  }
+
   @Patch(':id')
   @RequirePermissions('collab.tasks.update')
   @ApiOperation({ summary: 'Cập nhật task' })
