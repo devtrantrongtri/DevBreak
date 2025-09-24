@@ -168,7 +168,7 @@ const PMDashboardVisibilityControl: React.FC = () => {
           message="Lưu ý"
           description={
             <ul style={{ marginBottom: 0, paddingLeft: 20 }}>
-              <li>Nếu chọn "Hiển thị cho tất cả", dashboard sẽ xuất hiện cho mọi thành viên dự án</li>
+              <li>Nếu chọn &quot;Hiển thị cho tất cả&quot;, dashboard sẽ xuất hiện cho mọi thành viên dự án</li>
               <li>Nếu chọn role cụ thể, chỉ những người có role đó mới thấy dashboard</li>
               <li>PM luôn có quyền xem và quản lý cài đặt này</li>
             </ul>

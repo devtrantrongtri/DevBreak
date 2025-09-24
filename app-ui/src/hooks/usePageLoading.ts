@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 /**
@@ -49,7 +49,7 @@ export const useApiLoading = () => {
   const executeWithLoading = async <T>(
     apiCall: () => Promise<T>,
     onSuccess?: (data: T) => void,
-    onError?: (error: any) => void
+    onError?: (error: Error) => void
   ): Promise<T | null> => {
     try {
       setLoading(true);
@@ -57,10 +57,11 @@ export const useApiLoading = () => {
       const result = await apiCall();
       onSuccess?.(result);
       return result;
-    } catch (err: any) {
-      const errorMessage = err?.response?.data?.message || err?.message || 'An error occurred';
+    } catch (err: unknown) {
+      const error = err as Error & { response?: { data?: { message?: string } } };
+      const errorMessage = error?.response?.data?.message || error?.message || 'An error occurred';
       setError(errorMessage);
-      onError?.(err);
+      onError?.(error);
       return null;
     } finally {
       setLoading(false);

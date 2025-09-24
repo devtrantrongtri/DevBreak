@@ -12,15 +12,18 @@ import {
   MenuResponse,
   SeedResponse,
 } from '@/types/api';
-import { PaginatedActivityLogs } from '@/types/activity-logs';
+import { PaginatedActivityLogs, ActivityLog } from '@/types/activity-logs';
 import { Project, PMDashboardData, UserProgressData, Task } from '@/types/collab';
-import { 
-  Meeting, 
-  CreateMeetingDto, 
-  UpdateMeetingDto, 
-  JoinMeetingDto, 
-  UpdateParticipantDto, 
-  SendMessageDto 
+import { DashboardStats, GrowthData, ActivityTrend } from '@/types/dashboard';
+import {
+  Meeting,
+  CreateMeetingDto,
+  UpdateMeetingDto,
+  JoinMeetingDto,
+  UpdateParticipantDto,
+  SendMessageDto,
+  Participant,
+  MeetingMessage
 } from '@/types/meeting';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
@@ -50,7 +53,7 @@ class ApiClient {
 
   async request<T>(
     endpoint: string,
-    options: RequestInit & { data?: any } = {}
+    options: RequestInit & { data?: unknown } = {}
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
     const headers: Record<string, string> = {
@@ -96,7 +99,7 @@ class ApiClient {
 
     try {
       return JSON.parse(text);
-    } catch (error) {
+    } catch {
       console.warn('Failed to parse JSON response:', text);
       return {} as T;
     }
@@ -244,14 +247,14 @@ class ApiClient {
     permissionCode: string;
     order: number;
     isActive: boolean;
-  }): Promise<any> {
+  }): Promise<MenuResponse> {
     return this.request('/menus', {
       method: 'POST',
       body: JSON.stringify(menuData),
     });
   }
 
-  async deleteMenu(id: string): Promise<any> {
+  async deleteMenu(id: string): Promise<void> {
     return this.request(`/menus/${id}`, {
       method: 'DELETE',
     });
@@ -263,7 +266,7 @@ class ApiClient {
     description?: string;
     parentCode?: string | null;
     isActive: boolean;
-  }): Promise<any> {
+  }): Promise<PermissionResponse> {
     return this.request('/permissions', {
       method: 'POST',
       body: JSON.stringify(permissionData),
@@ -275,46 +278,46 @@ class ApiClient {
     description?: string;
     parentCode?: string | null;
     isActive: boolean;
-  }): Promise<any> {
+  }): Promise<PermissionResponse> {
     return this.request(`/permissions/${id}`, {
       method: 'PUT',
       body: JSON.stringify(permissionData),
     });
   }
 
-  async deletePermission(id: string): Promise<any> {
+  async deletePermission(id: string): Promise<void> {
     return this.request(`/permissions/${id}`, {
       method: 'DELETE',
     });
   }
 
   // Permission sync endpoints
-  async post(url: string): Promise<any> {
+  async post<T = unknown>(url: string): Promise<T> {
     return this.request(url, {
       method: 'POST',
     });
   }
 
-  async get(url: string): Promise<any> {
+  async get<T = unknown>(url: string): Promise<T> {
     return this.request(url, {
       method: 'GET',
     });
   }
 
   // Dashboard endpoints
-  async getDashboardStats(): Promise<any> {
+  async getDashboardStats(): Promise<DashboardStats> {
     return this.request('/dashboard/stats');
   }
 
-  async getUserGrowthData(months: number = 6): Promise<any[]> {
+  async getUserGrowthData(months: number = 6): Promise<GrowthData[]> {
     return this.request(`/dashboard/user-growth?months=${months}`);
   }
 
-  async getActivityTrends(days: number = 7): Promise<any[]> {
+  async getActivityTrends(days: number = 7): Promise<ActivityTrend[]> {
     return this.request(`/dashboard/activity-trends?days=${days}`);
   }
 
-  async getQuickStats(): Promise<any> {
+  async getQuickStats(): Promise<DashboardStats> {
     return this.request('/dashboard/quick-stats');
   }
 
@@ -342,14 +345,14 @@ class ApiClient {
     return this.request(`/activity-logs${queryString ? `?${queryString}` : ''}`);
   }
 
-  async getRecentActivities(limit: number = 10): Promise<any[]> {
+  async getRecentActivities(limit: number = 10): Promise<ActivityLog[]> {
     return this.request(`/activity-logs/recent?limit=${limit}`);
   }
 
   async getUserActivityLogs(userId: string, params?: {
     page?: number;
     limit?: number;
-  }): Promise<any> {
+  }): Promise<PaginatedActivityLogs> {
     const queryParams = new URLSearchParams();
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
@@ -365,7 +368,7 @@ class ApiClient {
   async getMyActivities(params?: {
     page?: number;
     limit?: number;
-  }): Promise<any> {
+  }): Promise<PaginatedActivityLogs> {
     const queryParams = new URLSearchParams();
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
@@ -396,7 +399,7 @@ class ApiClient {
     displayName: string;
     description?: string;
     defaultRoles?: string[];
-  }): Promise<any> {
+  }): Promise<Project> {
     return this.request(`/collab/projects/${projectId}/components`, {
       method: 'POST',
       data: componentData
@@ -408,7 +411,7 @@ class ApiClient {
   }
 
   // Project Members API
-  async getProjectMembers(projectId: string): Promise<any[]> {
+  async getProjectMembers(projectId: string): Promise<UserResponse[]> {
     return this.request(`/collab/projects/${projectId}/members`);
   }
 
@@ -470,7 +473,7 @@ class ApiClient {
       isVisibleToAll: boolean;
       visibleRoles?: string[];
     }
-  ): Promise<any> {
+  ): Promise<Project> {
     return this.request(`/collab/projects/${projectId}/component-visibility/${componentKey}`, {
       method: 'PUT',
       data: visibilityData
@@ -531,14 +534,14 @@ class ApiClient {
     meetingId: string, 
     participantId: string, 
     updateData: UpdateParticipantDto
-  ): Promise<any> {
+  ): Promise<Participant> {
     return this.request(`/meetings/${meetingId}/participants/${participantId}`, {
       method: 'PATCH',
       data: updateData,
     });
   }
 
-  async sendMeetingMessage(meetingId: string, messageData: SendMessageDto): Promise<any> {
+  async sendMeetingMessage(meetingId: string, messageData: SendMessageDto): Promise<MeetingMessage> {
     return this.request(`/meetings/${meetingId}/messages`, {
       method: 'POST',
       data: messageData,
@@ -548,7 +551,7 @@ class ApiClient {
   async getMeetingMessages(
     meetingId: string, 
     params?: { limit?: number; offset?: number }
-  ): Promise<any[]> {
+  ): Promise<MeetingMessage[]> {
     const queryParams = new URLSearchParams();
     if (params) {
       Object.entries(params).forEach(([key, value]) => {

@@ -14,10 +14,7 @@ import {
   Typography,
   Divider,
   Avatar,
-  Upload,
   Tag,
-  List,
-  Timeline,
   Tabs,
 } from 'antd';
 import {
@@ -80,13 +77,14 @@ const UserProfilePage: React.FC = () => {
   };
 
 
-  const handleSave = async (values: any) => {
+  const handleSave = async (values: Record<string, unknown>) => {
     try {
       setSaving(true);
       await apiClient.updateUser(userId, values);
       message.success('Cập nhật hồ sơ người dùng thành công');
       fetchUser();
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error & { response?: { data?: { message?: string } } };
       const errorMessage = error?.response?.data?.message || 'Không thể cập nhật hồ sơ người dùng';
       message.error(errorMessage);
       console.error('Error updating user:', error);

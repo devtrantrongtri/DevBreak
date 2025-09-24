@@ -43,14 +43,14 @@ export interface Task {
   description?: string;
   status: 'todo' | 'in_process' | 'ready_for_qc' | 'done';
   priority: 'low' | 'medium' | 'high' | 'urgent';
-  reporterId: string;
-  assigneeId?: string;
+  createdBy: string;
+  assignedTo?: string;
   dueDate?: string;
-  startedAt?: string;
-  completedAt?: string;
+  estimatedHours?: number;
+  actualHours?: number;
   createdAt: string;
   updatedAt: string;
-  reporter: {
+  creator: {
     id: string;
     displayName: string;
     email: string;
@@ -60,6 +60,12 @@ export interface Task {
     displayName: string;
     email: string;
   };
+  // Optional fields for frontend use
+  code?: string;
+  tags?: string[];
+  isActive?: boolean;
+  startedAt?: string;
+  completedAt?: string;
 }
 
 export interface TaskActivity {
@@ -173,13 +179,15 @@ export interface CreateTaskDto {
   projectId: string;
   title: string;
   description?: string;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  assigneeId?: string;
+  status?: 'todo' | 'in_process' | 'ready_for_qc' | 'done';
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
+  assignedTo?: string;
   dueDate?: string;
+  estimatedHours?: number;
 }
 
 export interface UpdateTaskDto extends Partial<CreateTaskDto> {
-  status?: 'todo' | 'in_process' | 'ready_for_qc' | 'done';
+  changeNote?: string;
 }
 
 export interface CreateDailyDto {
@@ -190,16 +198,17 @@ export interface CreateDailyDto {
   blockers?: string;
 }
 
-export interface UpdateDailyDto extends Partial<Omit<CreateDailyDto, 'projectId' | 'reportDate'>> {}
+export type UpdateDailyDto = Partial<Omit<CreateDailyDto, 'projectId' | 'reportDate'>>;
 
 // UI Types
 export interface DashboardSection {
   id: string;
   title: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   component: React.ComponentType<any>;
   roles: string[];
   span: 1 | 2;
-  props?: any;
+  props?: Record<string, unknown>;
 }
 
 export interface TaskColumn {

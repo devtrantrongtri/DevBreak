@@ -106,7 +106,8 @@ const EditGroupPage: React.FC = () => {
       
       message.success('Cập nhật nhóm thành công');
       router.push(`/dashboard/groups/${groupId}` );
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error & { response?: { data?: { message?: string } } };
       const errorMessage = error?.response?.data?.message || 'Không thể cập nhật nhóm';
       message.error(errorMessage);
       console.error('Error updating group:', error);
@@ -116,7 +117,7 @@ const EditGroupPage: React.FC = () => {
   };
 
 
-  const validateCode = (_: any, value: string) => {
+  const validateCode = (_: unknown, value: string) => {
     if (!value) {
       return Promise.reject(new Error('Mã nhóm là bắt buộc'));
     }

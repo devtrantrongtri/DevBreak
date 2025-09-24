@@ -88,7 +88,7 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
     switch (key) {
       case 'text':
         return <Tag key={key} closable onClose={() => handleRemoveFilter(key)}>
-          Tìm kiếm: "{value}"
+          Tìm kiếm: &quot;{value}&quot;
         </Tag>;
       case 'status':
         return <Tag key={key} closable onClose={() => handleRemoveFilter(key)} color="blue">

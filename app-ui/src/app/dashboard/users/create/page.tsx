@@ -65,7 +65,8 @@ const CreateUserPage: React.FC = () => {
       }
       message.success('Tạo người dùng thành công');
       router.push('/dashboard/users');
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error & { response?: { data?: { message?: string } } };
       const errorMessage = error?.response?.data?.message || 'Failed to create user';
       message.error(errorMessage);
       console.error('Error creating user:', error);
@@ -74,14 +75,14 @@ const CreateUserPage: React.FC = () => {
     }
   };
 
-  const validateEmail = (_: any, value: string) => {
+  const validateEmail = (_: unknown, value: string) => {
     if (!value) return Promise.reject(new Error('Địa chỉ email là bắt buộc'));
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(value)) return Promise.reject(new Error('Vui lòng nhập địa chỉ email hợp lệ'));
     return Promise.resolve();
   };
 
-  const validatePassword = (_: any, value: string) => {
+  const validatePassword = (_: unknown, value: string) => {
     if (!value) return Promise.reject(new Error('Mật khẩu là bắt buộc'));
     if (value.length < 6) return Promise.reject(new Error('Mật khẩu phải có ít nhất 6 ký tự'));
     return Promise.resolve();

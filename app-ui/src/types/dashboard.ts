@@ -50,7 +50,7 @@ export interface ActivityLog {
   action: string;
   resource: string;
   resourceId?: string | null;
-  details?: Record<string, any> | null;
+  details?: Record<string, unknown> | null;
   ipAddress: string;
   userAgent?: string | null;
   method?: string | null;

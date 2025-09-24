@@ -5,18 +5,23 @@ import { io, Socket } from 'socket.io-client';
 import { message } from 'antd';
 import { ActivityLog } from '@/types/dashboard';
 
+interface SystemNotification {
+  type: string;
+  message: string;
+  data?: Record<string, unknown>;
+}
+
 interface UseSocketOptions {
   enabled?: boolean;
   onNewActivity?: (activity: ActivityLog) => void;
   onRecentActivities?: (activities: ActivityLog[]) => void;
-  onSystemNotification?: (notification: any) => void;
+  onSystemNotification?: (notification: SystemNotification) => void;
   onError?: (error: string) => void;
 }
 
 interface UseSocketReturn {
   socket: Socket | null;
   connected: boolean;
-  onlineUsers: number;
   joinRoom: (room: string) => void;
   leaveRoom: (room: string) => void;
   getRecentActivities: (limit?: number) => void;
@@ -32,7 +37,6 @@ export const useSocket = ({
   onError,
 }: UseSocketOptions = {}): UseSocketReturn => {
   const [connected, setConnected] = useState(false);
-  const [onlineUsers, setOnlineUsers] = useState(0);
   const socketRef = useRef<Socket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const connectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -180,7 +184,7 @@ export const useSocket = ({
       onError?.(data.message);
     });
 
-  }, [getToken, onNewActivity, onSystemNotification, onError]);
+  }, [getToken, onNewActivity, onRecentActivities, onSystemNotification, onError]);
 
   const disconnect = useCallback(() => {
     // Clear all timeouts
@@ -251,7 +255,6 @@ export const useSocket = ({
   return {
     socket: socketRef.current,
     connected,
-    onlineUsers,
     joinRoom,
     leaveRoom,
     getRecentActivities,

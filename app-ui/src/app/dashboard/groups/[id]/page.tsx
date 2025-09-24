@@ -14,7 +14,6 @@ import {
   List,
   Avatar,
   Tree,
-  Tooltip,
   Badge,
 } from 'antd';
 import {
