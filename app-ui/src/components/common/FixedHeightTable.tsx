@@ -30,7 +30,7 @@ interface FixedHeightTableProps<T> extends TableProps<T> {
  * Component Table có chiều cao cố định, phần phân trang luôn nằm ở vị trí cố định
  * bất kể số lượng dòng hiển thị là bao nhiêu
  */
-function FixedHeightTable<T extends Record<string, unknown> = Record<string, unknown>>({
+function FixedHeightTable<T = any>({
   containerHeight = 'calc(100vh - 240px)',
   scrollY = 'calc(100vh - 350px)',
   scrollX = 800,

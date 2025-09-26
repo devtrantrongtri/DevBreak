@@ -30,8 +30,8 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
   const assignees = React.useMemo(() => {
     const uniqueAssignees = new Map();
     tasks.forEach(task => {
-      if (task.assignee && !uniqueAssignees.has(task.assigneeId)) {
-        uniqueAssignees.set(task.assigneeId, task.assignee);
+      if (task.assignee && !uniqueAssignees.has(task.assignedTo)) {
+        uniqueAssignees.set(task.assignedTo, task.assignee);
       }
     });
     return Array.from(uniqueAssignees.values());

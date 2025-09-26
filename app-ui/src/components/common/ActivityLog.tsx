@@ -220,8 +220,7 @@ const ActivityLog: React.FC<ActivityLogProps> = ({
                   <Text>{getActionDescription(activity)}</Text>
                   <Tag 
                     color={getStatusColor(activity.status)} 
-                    size="small"
-                    style={{ marginLeft: 8 }}
+                    style={{ marginLeft: 8, fontSize: '12px', padding: '0 6px' }}
                   >
                     {activity.status}
                   </Tag>

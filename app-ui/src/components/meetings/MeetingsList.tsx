@@ -107,6 +107,11 @@ const MeetingsList: React.FC<MeetingsListProps> = ({
     scheduledAt: string;
     duration: number;
     type: 'video' | 'audio' | 'screen_share';
+    projectId?: string;
+    timeRange?: [any, any];
+    isVideoEnabled?: boolean;
+    isAudioEnabled?: boolean;
+    isChatEnabled?: boolean;
   }) => {
     try {
       setCreating(true);

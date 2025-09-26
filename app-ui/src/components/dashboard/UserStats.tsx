@@ -239,7 +239,7 @@ const UserStats: React.FC<UserStatsProps> = ({ onViewAllUsers }) => {
                     {user.groups && user.groups.length > 0 ? (
                       <Space wrap>
                         {user.groups.map(group => (
-                          <Tag key={group.id} size="small">
+                          <Tag key={group.id} style={{ fontSize: '12px', padding: '0 6px' }}>
                             {group.name}
                           </Tag>
                         ))}
