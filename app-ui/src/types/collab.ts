@@ -96,6 +96,7 @@ export interface Daily {
   createdAt: string;
   updatedAt: string;
   user: {
+    avatar: any;
     id: string;
     displayName: string;
     email: string;

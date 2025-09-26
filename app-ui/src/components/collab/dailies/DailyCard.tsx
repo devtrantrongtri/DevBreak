@@ -74,7 +74,7 @@ const DailyCard: React.FC<DailyCardProps> = ({
 
         <Space size="small">
           {hasBlockers && (
-            <Tag color="red" size="small" icon={<ExclamationCircleOutlined />}>
+            <Tag color="red"  icon={<ExclamationCircleOutlined />}>
               Có vướng mắc
             </Tag>
           )}
@@ -104,7 +104,7 @@ const DailyCard: React.FC<DailyCardProps> = ({
                 lineHeight: 1.4
               }}
               onClick={handleTaskMentionClick}
-              dangerouslySetInnerHTML={{ __html: daily.yesterday }}
+              dangerouslySetInnerHTML={{ __html: daily.yesterday || '' }}
             />
           </div>
         )}
@@ -122,7 +122,7 @@ const DailyCard: React.FC<DailyCardProps> = ({
                 lineHeight: 1.4
               }}
               onClick={handleTaskMentionClick}
-              dangerouslySetInnerHTML={{ __html: daily.today }}
+              dangerouslySetInnerHTML={{ __html: daily.today || '' }}
             />
           </div>
         )}
@@ -147,7 +147,7 @@ const DailyCard: React.FC<DailyCardProps> = ({
                   color: '#ff4d4f'
                 }}
                 onClick={handleTaskMentionClick}
-                dangerouslySetInnerHTML={{ __html: daily.blockers }}
+                dangerouslySetInnerHTML={{ __html: daily.blockers || '' }}
               />
             </div>
           </>

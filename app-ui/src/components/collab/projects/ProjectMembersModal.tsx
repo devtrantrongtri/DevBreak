@@ -288,11 +288,9 @@ const ProjectMembersModal: React.FC<ProjectMembersModalProps> = ({
                 style={{ flex: 1 }}
                 showSearch
                 filterOption={(input, option) => {
-                  const children = option?.children;
-                  if (typeof children === 'string') {
-                    return children.toLowerCase().includes(input.toLowerCase());
-                  }
-                  return false;
+                  // Use label instead of children for filtering
+                  const label = option?.label as string;
+                  return label?.toLowerCase().includes(input.toLowerCase()) || false;
                 }}
               >
                 {users.map(user => (

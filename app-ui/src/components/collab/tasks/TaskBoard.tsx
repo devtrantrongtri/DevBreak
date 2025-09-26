@@ -73,7 +73,7 @@ const TaskBoard: React.FC<TaskBoardProps> = ({
   const { filters, setFilters, filteredTasks, clearFilters, hasActiveFilters } = useTaskFilters(tasks);
 
   // Custom collision detection for better accuracy
-  const customCollisionDetection = (args: { droppableContainers: Map<string, unknown>; active: { id: string }; collisionRect: DOMRect }) => {
+  const customCollisionDetection = (args: any) => {
     // First, try pointer-based collision detection for high precision
     const pointerCollisions = pointerWithin(args);
 

@@ -64,9 +64,9 @@ export const useTaskFilters = (tasks: Task[]): UseTaskFiltersReturn => {
       // Assignee filter
       if (filters.assigneeId !== 'all') {
         if (filters.assigneeId === 'unassigned') {
-          if (task.assigneeId) return false;
+          if (task.assignedTo) return false;
         } else {
-          if (task.assigneeId !== filters.assigneeId) return false;
+          if (task.assignedTo !== filters.assigneeId) return false;
         }
       }
 
