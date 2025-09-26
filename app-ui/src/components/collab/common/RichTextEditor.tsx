@@ -674,7 +674,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
               </div>
             )}
 
-            {taskDetails.actualHours && parseFloat(taskDetails.actualHours) > 0 && (
+            {taskDetails.actualHours && parseFloat(String(taskDetails.actualHours)) > 0 && (
               <div>
                 <Typography.Text strong>Thời gian thực tế:</Typography.Text>
                 <Typography.Text style={{ marginLeft: '8px' }}>{taskDetails.actualHours} giờ</Typography.Text>

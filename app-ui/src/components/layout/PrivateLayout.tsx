@@ -67,7 +67,7 @@ const PrivateLayout: React.FC<PrivateLayoutProps> = ({ children }) => {
       };
 
       if (item.children && item.children.length > 0) {
-        (antdItem as any).children = item.children.map(convertToAntdMenuItem);
+        (antdItem as { children?: unknown[] }).children = item.children.map(convertToAntdMenuItem);
       }
 
       return antdItem;

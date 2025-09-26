@@ -58,7 +58,8 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
       message.success('Đổi mật khẩu thành công');
       form.resetFields();
       onCancel();
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error & { response?: { data?: { message?: string } } };
       const errorMessage = error?.response?.data?.message || 'Không thể đổi mật khẩu';
       message.error(errorMessage);
     } finally {
@@ -71,7 +72,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
     onCancel();
   };
 
-  const validatePassword = (_: any, value: string) => {
+  const validatePassword = (_: unknown, value: string) => {
     if (!value) {
       return Promise.reject(new Error('Mật khẩu mới là bắt buộc'));
     }
@@ -84,7 +85,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
     return Promise.resolve();
   };
 
-  const validateConfirmPassword = (_: any, value: string) => {
+  const validateConfirmPassword = (_: unknown, value: string) => {
     if (!value) {
       return Promise.reject(new Error('Xác nhận mật khẩu là bắt buộc'));
     }

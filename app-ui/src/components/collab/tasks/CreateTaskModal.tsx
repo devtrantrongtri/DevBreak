@@ -120,7 +120,8 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
       form.resetFields();
       onSuccess?.();
       onCancel();
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error & { response?: { data?: { message?: string } } };
       console.error('Create task failed:', error);
 
       // Handle validation errors

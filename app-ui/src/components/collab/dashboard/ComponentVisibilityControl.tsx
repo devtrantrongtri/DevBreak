@@ -64,7 +64,8 @@ const ComponentVisibilityControl: React.FC<ComponentVisibilityControlProps> = ({
         setIsVisibleToAll(true);
         setSelectedRoles([]);
       }
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error & { message?: string };
       console.error('Failed to load visibility settings:', error);
       // Don't show error for 404 - means no custom settings exist
       if (!error?.message?.includes('404')) {
@@ -100,7 +101,8 @@ const ComponentVisibilityControl: React.FC<ComponentVisibilityControlProps> = ({
       
       // Reload to get updated data
       loadVisibilitySettings();
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error & { message?: string };
       console.error('Failed to update visibility:', error);
       message.error(`Failed to update visibility: ${error?.message || 'Unknown error'}`);
     } finally {
@@ -132,7 +134,8 @@ const ComponentVisibilityControl: React.FC<ComponentVisibilityControlProps> = ({
       setTimeout(() => {
         window.location.reload();
       }, 500);
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error & { message?: string };
       console.error('Failed to reset visibility:', error);
       message.error(`Failed to reset visibility: ${error?.message || 'Unknown error'}`);
     } finally {

@@ -86,14 +86,14 @@ const ActivityLogsPage: React.FC = () => {
     try {
       message.info('Export functionality will be implemented soon');
       // TODO: Implement export functionality
-    } catch (error) {
+    } catch {
       message.error('Failed to export activity logs');
     }
   };
 
   useEffect(() => {
     fetchActivityLogs();
-  }, []);
+  }, [fetchActivityLogs]);
 
   return (
     <div style={{ padding: '24px' }}>

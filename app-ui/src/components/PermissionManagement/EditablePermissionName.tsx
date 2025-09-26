@@ -24,7 +24,7 @@ const EditablePermissionName: React.FC<EditablePermissionNameProps> = ({
   const [editing, setEditing] = useState(false);
   const [inputValue, setInputValue] = useState(value);
   const [loading, setSaving] = useState(false);
-  const inputRef = useRef<any>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setInputValue(value);

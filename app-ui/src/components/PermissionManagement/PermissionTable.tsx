@@ -107,7 +107,7 @@ const PermissionTable: React.FC<PermissionTableProps> = ({
       title: 'Thao tác',
       key: 'actions',
       width: 80,
-      render: (_: any, permission: PermissionResponse) => (
+      render: (_: unknown, permission: PermissionResponse) => (
         <Dropdown menu={getActionMenu(permission)} trigger={['click']}>
           <Button
             type="text"

@@ -41,7 +41,8 @@ const DeleteMenuModal: React.FC<DeleteMenuModalProps> = ({
       
       onSuccess();
       onClose();
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error & { response?: { data?: { message?: string } } };
       // Check if error is a 404 Not Found, which means the menu was already deleted
       if (error.message && error.message.includes('not found')) {
         message.success('Xóa menu thành công');

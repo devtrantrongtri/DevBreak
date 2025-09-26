@@ -39,7 +39,8 @@ export const useTaskBoard = (): UseTaskBoardReturn => {
       );
       
       setTasks(response || []);
-    } catch (err: any) {
+    } catch (error: unknown) {
+      const err = error as Error & { message?: string };
       console.error('Failed to load tasks:', err);
       setError(err.message || 'Không thể tải danh sách task');
       setTasks([]);
@@ -63,7 +64,8 @@ export const useTaskBoard = (): UseTaskBoardReturn => {
       ));
 
       message.success('Cập nhật task thành công');
-    } catch (err: any) {
+    } catch (error: unknown) {
+      const err = error as Error & { message?: string };
       console.error('Failed to update task:', err);
       message.error(err.message || 'Không thể cập nhật task');
       throw err;
@@ -107,7 +109,8 @@ export const useTaskBoard = (): UseTaskBoardReturn => {
 
       setTasks(prev => [...prev, response]);
       message.success('Tạo task thành công');
-    } catch (err: any) {
+    } catch (error: unknown) {
+      const err = error as Error & { message?: string };
       console.error('Failed to create task:', err);
       message.error(err.message || 'Không thể tạo task');
       throw err;
@@ -122,7 +125,8 @@ export const useTaskBoard = (): UseTaskBoardReturn => {
 
       setTasks(prev => prev.filter(task => task.id !== taskId));
       message.success('Xóa task thành công');
-    } catch (err: any) {
+    } catch (error: unknown) {
+      const err = error as Error & { message?: string };
       console.error('Failed to delete task:', err);
       message.error(err.message || 'Không thể xóa task');
       throw err;

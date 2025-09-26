@@ -4,6 +4,7 @@ import { Project } from './projects/entities/project.entity';
 import { ProjectMember } from './projects/entities/project-member.entity';
 import { Task } from './tasks/entities/task.entity';
 import { Daily } from './dailies/entities/daily.entity';
+import { ProjectComponentVisibility } from './projects/entities/project-component-visibility.entity';
 
 export async function seedCollabData(dataSource: DataSource) {
   console.log('🌱 Seeding Collab data...');
@@ -13,6 +14,7 @@ export async function seedCollabData(dataSource: DataSource) {
   const memberRepository = dataSource.getRepository(ProjectMember);
   const taskRepository = dataSource.getRepository(Task);
   const dailyRepository = dataSource.getRepository(Daily);
+  const visibilityRepository = dataSource.getRepository(ProjectComponentVisibility);
 
   // Get existing users
   const users = await userRepository.find({ take: 10 });
@@ -193,6 +195,64 @@ export async function seedCollabData(dataSource: DataSource) {
       });
       await dailyRepository.save(daily);
       console.log('✅ Created daily report for user:', dailyInfo.userId);
+    }
+  }
+
+  // Initialize project component visibility for all built-in components
+  const componentKeys = [
+    'daily-reports',
+    'task-board',
+    'meetings',
+    'summary',
+    'team-performance',
+    'project-timeline'
+  ];
+
+  const componentVisibilityData = [
+    {
+      componentKey: 'daily-reports',
+      isVisibleToAll: false,
+      visibleRoles: ['PM', 'BC', 'DEV', 'QC']
+    },
+    {
+      componentKey: 'task-board',
+      isVisibleToAll: false,
+      visibleRoles: ['PM', 'BC', 'DEV', 'QC']
+    },
+    {
+      componentKey: 'meetings',
+      isVisibleToAll: false,
+      visibleRoles: ['PM', 'BC', 'DEV', 'QC']
+    },
+    {
+      componentKey: 'summary',
+      isVisibleToAll: false,
+      visibleRoles: ['PM', 'BC']
+    },
+    {
+      componentKey: 'team-performance',
+      isVisibleToAll: false,
+      visibleRoles: ['PM']
+    },
+    {
+      componentKey: 'project-timeline',
+      isVisibleToAll: false,
+      visibleRoles: ['PM', 'BC']
+    }
+  ];
+
+  for (const visibilityInfo of componentVisibilityData) {
+    const existingVisibility = await visibilityRepository.findOne({
+      where: { projectId: project.id, componentKey: visibilityInfo.componentKey }
+    });
+
+    if (!existingVisibility) {
+      const visibility = visibilityRepository.create({
+        projectId: project.id,
+        ...visibilityInfo,
+      });
+      await visibilityRepository.save(visibility);
+      console.log('✅ Created component visibility for:', visibilityInfo.componentKey);
     }
   }
 

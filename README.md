@@ -1,3 +1,13 @@
+ui
+npm run dev
+
+
+be
+npm run start:dev
+/api try seed
+
+
+
 <div align="center">
   <h1>DevBreak</h1>
   <div>

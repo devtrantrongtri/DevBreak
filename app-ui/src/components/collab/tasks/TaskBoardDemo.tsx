@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Button, Modal, Form, Input, Select, DatePicker, message } from 'antd';
 import { Task } from '@/types/collab';
 import TaskBoard from './TaskBoard';
-import CreateTaskModal from './CreateTaskModal';
+
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -28,7 +28,13 @@ const TaskBoardDemo: React.FC = () => {
     setEditingTask(null);
   };
 
-  const handleTaskSubmit = async (values: any) => {
+  const handleTaskSubmit = async (values: {
+    title: string;
+    description?: string;
+    priority: 'low' | 'medium' | 'high' | 'urgent';
+    assignedTo?: string;
+    dueDate?: string;
+  }) => {
     try {
       if (editingTask) {
         // Update task logic here

@@ -97,7 +97,8 @@ const ProjectMembersModal: React.FC<ProjectMembersModalProps> = ({
       setLoading(true);
       const response = await apiClient.request<ProjectMember[]>(`/collab/projects/${projectId}/members`);
       setMembers(response);
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error;
       console.error('Load members failed:', error);
       message.error('Không thể tải danh sách thành viên');
     } finally {
@@ -112,7 +113,8 @@ const ProjectMembersModal: React.FC<ProjectMembersModalProps> = ({
       const memberUserIds = members.map(m => m.userId);
       const availableUsers = response.filter(user => !memberUserIds.includes(user.id));
       setUsers(availableUsers);
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error;
       console.error('Load users failed:', error);
       message.error('Không thể tải danh sách users');
     }
@@ -138,7 +140,8 @@ const ProjectMembersModal: React.FC<ProjectMembersModalProps> = ({
       setSelectedUserId('');
       setSelectedRole('DEV');
       loadMembers();
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error & { message?: string };
       console.error('Add member failed:', error);
       message.error(error?.message || 'Thêm thành viên thất bại');
     } finally {
@@ -155,7 +158,8 @@ const ProjectMembersModal: React.FC<ProjectMembersModalProps> = ({
       
       message.success('Cập nhật vai trò thành công');
       loadMembers();
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error & { message?: string };
       console.error('Update role failed:', error);
       message.error(error?.message || 'Cập nhật vai trò thất bại');
     }
@@ -169,7 +173,8 @@ const ProjectMembersModal: React.FC<ProjectMembersModalProps> = ({
       
       message.success('Xóa thành viên thành công');
       loadMembers();
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error & { message?: string };
       console.error('Remove member failed:', error);
       message.error(error?.message || 'Xóa thành viên thất bại');
     }

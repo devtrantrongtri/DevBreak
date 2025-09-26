@@ -212,7 +212,7 @@ export const useWebRTC = ({
       console.error('❌ Error starting screen share:', error);
       onError?.(`Failed to start screen sharing: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
-  }, [localStream, onError, stopScreenShare]);
+  }, [localStream, onError]);
 
   const stopScreenShare = useCallback(async () => {
     try {

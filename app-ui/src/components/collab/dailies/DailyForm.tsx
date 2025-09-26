@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, notification, DatePicker, Space, Alert } from 'antd';
+import { Form, Button, notification, Alert } from 'antd';
 import { SaveOutlined, CalendarOutlined } from '@ant-design/icons';
 import { useProject } from '@/contexts/ProjectContext';
 import { CreateDailyDto, UpdateDailyDto, Daily } from '@/types/collab';
@@ -57,7 +57,12 @@ const DailyForm: React.FC<DailyFormProps> = ({
     }
   };
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: {
+    yesterday: string;
+    today: string;
+    blockers: string;
+    reportDate: string;
+  }) => {
     if (!currentProject) {
       notification.error({
         message: 'Lỗi',
@@ -97,7 +102,7 @@ const DailyForm: React.FC<DailyFormProps> = ({
         // Create new daily
         const createDto: CreateDailyDto = {
           projectId: currentProject.id,
-          date: reportDate,
+          reportDate: reportDate,
           yesterday: values.yesterday,
           today: values.today,
           blockers: values.blockers || '',
@@ -120,7 +125,8 @@ const DailyForm: React.FC<DailyFormProps> = ({
         setExistingDaily(response);
         onSuccess?.(response);
       }
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error & { message?: string };
       console.error('Failed to save daily:', error);
       notification.error({
         message: 'Lỗi',

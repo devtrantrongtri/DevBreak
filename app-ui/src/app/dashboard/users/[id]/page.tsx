@@ -317,7 +317,7 @@ const UserDetailsPage: React.FC = () => {
               <Space>
                 <TeamOutlined />
                 <span>{group.name}</span>
-                <Tag size="small">{group.code}</Tag>
+                <Tag >{group.code}</Tag>
               </Space>
             </Select.Option>
           ))}

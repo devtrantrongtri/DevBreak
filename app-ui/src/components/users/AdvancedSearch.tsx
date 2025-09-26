@@ -57,7 +57,13 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const { t } = useTranslation();
 
-  const handleSearch = (values: any) => {
+  const handleSearch = (values: {
+    searchText?: string;
+    status?: string;
+    groups?: string[];
+    dateRange?: [string, string];
+    roles?: string[];
+  }) => {
     const filters: SearchFilters = {
       searchText: values.searchText?.trim(),
       status: values.status,
@@ -84,7 +90,7 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
     onClear();
   };
 
-  const getFilterTag = (key: string, value: any) => {
+  const getFilterTag = (key: string, value: unknown) => {
     switch (key) {
       case 'text':
         return <Tag key={key} closable onClose={() => handleRemoveFilter(key)}>

@@ -81,8 +81,8 @@ const RebindPermissionModal: React.FC<RebindPermissionModalProps> = ({
             showSearch
             optionFilterProp="children"
             filterOption={(input, option) =>
-              (option?.children as any)?.props?.children?.[0]?.toLowerCase().includes(input.toLowerCase()) ||
-              (option?.children as any)?.props?.children?.[1]?.props?.children?.toLowerCase().includes(input.toLowerCase())
+              (option?.children as React.ReactElement)?.props?.children?.[0]?.toLowerCase().includes(input.toLowerCase()) ||
+              (option?.children as React.ReactElement)?.props?.children?.[1]?.props?.children?.toLowerCase().includes(input.toLowerCase())
             }
           >
             {permissions.map(permission => (

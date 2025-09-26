@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Row, Col, Typography, Space, Button, Modal } from 'antd';
 import { ProjectOutlined, PlusOutlined, TeamOutlined } from '@ant-design/icons';
 import { useProject } from '@/contexts/ProjectContext';
-import { DashboardSection } from '@/types/collab';
+import { DashboardSection, Task } from '@/types/collab';
 import DashboardCard from './DashboardCard';
 import RoleBasedComponent from '../common/RoleBasedComponent';
 import DailyReportsSection from '../dailies/DailyReportsSection';
@@ -65,7 +65,7 @@ const CollabDashboard: React.FC = () => {
   const [createDailyModalVisible, setCreateDailyModalVisible] = useState(false);
   const [membersModalVisible, setMembersModalVisible] = useState(false);
   const [createProjectModalVisible, setCreateProjectModalVisible] = useState(false);
-  const [selectedTask, setSelectedTask] = useState(null);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [taskInitialStatus, setTaskInitialStatus] = useState<'todo' | 'in_process' | 'ready_for_qc' | 'done'>('todo');
   const [taskRefreshTrigger, setTaskRefreshTrigger] = useState(0);
 
@@ -79,7 +79,7 @@ const CollabDashboard: React.FC = () => {
     setCreateTaskModalVisible(true);
   };
 
-  const handleTaskEdit = (task: any) => {
+  const handleTaskEdit = (task: Task) => {
     setSelectedTask(task);
     setEditTaskModalVisible(true);
   };

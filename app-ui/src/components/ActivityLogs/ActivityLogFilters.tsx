@@ -29,8 +29,16 @@ interface FilterValues {
   dateRange?: [dayjs.Dayjs, dayjs.Dayjs];
 }
 
+interface FilterObject {
+  search?: string;
+  action?: string;
+  userId?: string;
+  dateRange?: [string, string];
+  [key: string]: unknown;
+}
+
 interface ActivityLogFiltersProps {
-  onFilter: (filters: any) => void;
+  onFilter: (filters: FilterObject) => void;
   loading?: boolean;
   showUserFilter?: boolean;
 }
@@ -44,7 +52,7 @@ const ActivityLogFilters: React.FC<ActivityLogFiltersProps> = ({
   const [collapsed, setCollapsed] = useState(true);
 
   const handleFilter = (values: FilterValues) => {
-    const filters: any = {};
+    const filters: FilterObject = {};
     
     if (values.search) {
       filters.search = values.search;

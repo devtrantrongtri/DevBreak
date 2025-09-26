@@ -74,7 +74,7 @@ const AddPermissionModal: React.FC<AddPermissionModalProps> = ({
     onClose();
   };
 
-  const validateCode = (_: any, value: string) => {
+  const validateCode = (_: unknown, value: string) => {
     if (!value) {
       return Promise.reject(new Error('Vui lòng nhập mã quyền'));
     }

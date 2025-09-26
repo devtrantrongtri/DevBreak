@@ -26,10 +26,6 @@ const GroupsPage: React.FC = () => {
   const canDeleteGroup = permissions.includes('group.delete');
   const canAssignPermissions = permissions.includes('group.assignPermissions');
 
-  useEffect(() => {
-    fetchGroups();
-  }, []);
-
   const fetchGroups = async () => {
     try {
       setLoading(true);
@@ -42,6 +38,10 @@ const GroupsPage: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchGroups();
+  }, [fetchGroups]);
 
   const handleDelete = async (groupId: string) => {
     try {

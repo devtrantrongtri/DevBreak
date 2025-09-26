@@ -304,11 +304,11 @@ function buildTreeFromPermissions(permissions: PermissionResponse[], searchValue
   const moduleMap = new Map<string, PermissionResponse[]>();
   
   permissions.forEach(permission => {
-    const module = permission.code.split('.')[0] || 'general';
-    if (!moduleMap.has(module)) {
-      moduleMap.set(module, []);
+    const moduleCode = permission.code.split('.')[0] || 'general';
+    if (!moduleMap.has(moduleCode)) {
+      moduleMap.set(moduleCode, []);
     }
-    moduleMap.get(module)!.push(permission);
+    moduleMap.get(moduleCode)!.push(permission);
   });
 
   return Array.from(moduleMap.entries())

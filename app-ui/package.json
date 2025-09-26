@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack -p 3001",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "build:no-lint": "ESLINT_NO_DEV_ERRORS=true next build --turbopack"
   },
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.1.0",

@@ -71,7 +71,7 @@ const PMDashboardVisibilityControl: React.FC = () => {
         componentKey,
         {
           isVisibleToAll,
-          visibleRoles: isVisibleToAll ? null : selectedRoles
+          visibleRoles: isVisibleToAll ? undefined : selectedRoles
         }
       );
       

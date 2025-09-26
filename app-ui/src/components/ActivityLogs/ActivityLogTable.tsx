@@ -72,7 +72,7 @@ const ActivityLogTable: React.FC<ActivityLogTableProps> = ({
       dataIndex: 'user',
       key: 'user',
       width: 200,
-      render: (user: any) => (
+      render: (user: { id: string; displayName: string; email: string } | null) => (
         <Space>
           <Avatar size="small" icon={<UserOutlined />} />
           <div>
@@ -140,7 +140,7 @@ const ActivityLogTable: React.FC<ActivityLogTableProps> = ({
       title: 'Details',
       dataIndex: 'details',
       key: 'details',
-      render: (details: Record<string, any>) => {
+      render: (details: Record<string, unknown>) => {
         if (!details || Object.keys(details).length === 0) return '-';
         
         const detailText = Object.entries(details)

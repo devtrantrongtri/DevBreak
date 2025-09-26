@@ -136,7 +136,14 @@ const ProjectMeetings: React.FC<ProjectMeetingsProps> = ({
     loadProjectMembers();
   }, [loadMeetings, loadProjectMembers]);
 
-  const handleCreateMeeting = async (values: any) => {
+  const handleCreateMeeting = async (values: {
+    title: string;
+    description?: string;
+    scheduledAt: string;
+    duration: number;
+    type: 'video' | 'audio' | 'screen_share';
+    participants?: string[];
+  }) => {
     try {
       setCreating(true);
       

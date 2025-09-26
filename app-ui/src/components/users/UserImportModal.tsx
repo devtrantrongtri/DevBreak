@@ -132,7 +132,8 @@ const UserImportModal: React.FC<UserImportModalProps> = ({
           
           // Small delay to show progress
           await new Promise(resolve => setTimeout(resolve, 100));
-        } catch (error: any) {
+        } catch (err: unknown) {
+          const error = err as Error & { response?: { data?: { message?: string } } };
           results[i].status = 'error';
           results[i].error = error?.response?.data?.message || 'Failed to create user';
           setImportData([...results]);
