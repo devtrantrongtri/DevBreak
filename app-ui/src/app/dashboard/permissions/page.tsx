@@ -89,7 +89,7 @@ const PermissionsPage: React.FC = () => {
 
   const fetchModules = async () => {
     try {
-      const response = await apiClient.get('/permissions/modules');
+      const response : any = await apiClient.get('/permissions/modules');
       setModules(response.data.modules || []);
     } catch (error) {
       console.error('Error fetching modules:', error);
@@ -98,7 +98,7 @@ const PermissionsPage: React.FC = () => {
 
   const handleSync = async (): Promise<SyncResult> => {
     try {
-      const response = await apiClient.post('/permissions/sync');
+      const response :any = await apiClient.post('/permissions/sync');
       setLastSyncTime(new Date());
       await fetchPermissions();
       await fetchModules();
@@ -117,7 +117,7 @@ const PermissionsPage: React.FC = () => {
 
   const handleDiscover = async (): Promise<DiscoveredPermission[]> => {
     try {
-      const response = await apiClient.get('/permissions/discover');
+      const response :any = await apiClient.get('/permissions/discover');
       return response.permissions || [];
     } catch (error) {
       console.error('Discovery failed:', error);

@@ -69,7 +69,8 @@ const CreateDailyModal: React.FC<CreateDailyModalProps> = ({
       form.resetFields();
       onSuccess?.();
       onCancel();
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error & { response?: { data?: { message?: string } } };
       console.error('Create daily failed:', error);
 
       // Handle validation errors

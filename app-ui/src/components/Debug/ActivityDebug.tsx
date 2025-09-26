@@ -13,7 +13,18 @@ interface ActivityDebugProps {
 }
 
 const ActivityDebug: React.FC<ActivityDebugProps> = ({ show = false }) => {
-  const [cacheStats, setCacheStats] = useState<any>(null);
+  const [cacheStats, setCacheStats] = useState<{
+    totalEntries: number;
+    totalHits: number;
+    totalMisses: number;
+    hitRate: number;
+    entries?: Array<{
+      key: string;
+      expired: boolean;
+      lastAccessed: string;
+      hitCount: number;
+    }>;
+  } | null>(null);
   const [refreshCount, setRefreshCount] = useState(0);
 
   const refreshStats = () => {
@@ -90,7 +101,7 @@ const ActivityDebug: React.FC<ActivityDebugProps> = ({ show = false }) => {
           
           <div style={{ marginTop: 16 }}>
             <Text strong>Cache Entries:</Text>
-            {cacheStats?.entries?.map((entry: any, index: number) => (
+            {cacheStats?.entries?.map((entry, index: number) => (
               <div key={index} style={{ marginTop: 8, padding: 8, background: '#f5f5f5', borderRadius: 4 }}>
                 <Space direction="vertical" size="small" style={{ width: '100%' }}>
                   <Space>

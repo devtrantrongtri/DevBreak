@@ -264,11 +264,10 @@ const ProfilePage: React.FC = () => {
           <Tabs 
             defaultActiveKey="info"
             size="small"
+            className="profile-tabs"
             style={{
-              '& .ant-tabs-tab': {
-                fontSize: '13px',
-                padding: '8px 16px'
-              }
+              fontSize: '13px',
+              padding: '8px 16px'
             }}
             items={[
               {

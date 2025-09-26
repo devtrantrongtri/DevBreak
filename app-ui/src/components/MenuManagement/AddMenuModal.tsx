@@ -48,7 +48,11 @@ const AddMenuModal: React.FC<AddMenuModalProps> = ({
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const { refreshUserData } = useAuth();
-  const [parentOptions, setParentOptions] = useState<any[]>([]);
+  const [parentOptions, setParentOptions] = useState<Array<{
+    title: string;
+    value: string;
+    key: string;
+  }>>([]);
 
   useEffect(() => {
     if (menus.length > 0) {
@@ -106,7 +110,7 @@ const AddMenuModal: React.FC<AddMenuModalProps> = ({
     onClose();
   };
 
-  const validatePath = (_: any, value: string) => {
+  const validatePath = (_: unknown, value: string) => {
     if (!value) {
       return Promise.reject('Vui lòng nhập đường dẫn menu');
     }

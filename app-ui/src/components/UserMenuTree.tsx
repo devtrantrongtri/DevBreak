@@ -23,7 +23,13 @@ const UserMenuTree: React.FC<UserMenuTreeProps> = ({ onMenuSelect, className }) 
     }
   }, [menuTree]);
 
-  const buildTreeData = (menus: any[]): DataNode[] => {
+  const buildTreeData = (menus: Array<{
+    id: string;
+    name: string;
+    path: string;
+    icon?: string;
+    children?: Array<{ id: string; name: string; path: string; icon?: string }>;
+  }>): DataNode[] => {
     return menus.map(menu => ({
       title: (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -36,7 +42,7 @@ const UserMenuTree: React.FC<UserMenuTreeProps> = ({ onMenuSelect, className }) 
     }));
   };
 
-  const handleSelect = (selectedKeys: React.Key[], info: any) => {
+  const handleSelect = (selectedKeys: React.Key[], info: { node: DataNode }) => {
     if (selectedKeys.length > 0 && onMenuSelect) {
       const selectedMenu = findMenuByKey(menuTree, selectedKeys[0] as string);
       if (selectedMenu) {
@@ -45,7 +51,12 @@ const UserMenuTree: React.FC<UserMenuTreeProps> = ({ onMenuSelect, className }) 
     }
   };
 
-  const findMenuByKey = (menus: any[], key: string): any => {
+  const findMenuByKey = (menus: Array<{
+    id: string;
+    name: string;
+    path: string;
+    children?: Array<{ id: string; name: string; path: string }>;
+  }>, key: string): { id: string; name: string; path: string } | null => {
     for (const menu of menus) {
       if (menu.id === key) {
         return menu;

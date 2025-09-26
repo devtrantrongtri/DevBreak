@@ -7,7 +7,6 @@ import {
   Input,
   Select,
   Button,
-  message,
   Space,
   Typography,
   App
@@ -56,7 +55,8 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
       await refreshProjects();
       onSuccess?.();
       onCancel();
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error & { response?: { data?: { message?: string } } };
       console.error('Create project failed:', error);
       messageApi.error(error?.message || 'Tạo dự án thất bại');
     } finally {

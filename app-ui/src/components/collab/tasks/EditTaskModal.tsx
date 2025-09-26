@@ -99,7 +99,15 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
     }
   };
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: {
+    title: string;
+    description?: string;
+    status: 'todo' | 'in_progress' | 'review' | 'done';
+    priority: 'low' | 'medium' | 'high' | 'urgent';
+    assignedTo?: string;
+    dueDate?: string;
+    estimatedHours?: number;
+  }) => {
     if (!task) return;
 
     setLoading(true);

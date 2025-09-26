@@ -38,7 +38,7 @@ interface ActivityLog {
   action: string;
   resource: string;
   resourceId?: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
   ipAddress: string;
   userAgent?: string;
   method?: string;

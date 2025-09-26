@@ -37,7 +37,8 @@ const ProjectVisibilityControl: React.FC = () => {
         `/collab/projects/${currentProject.id}/component-visibility`
       );
       setVisibilitySettings(response);
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error & { message?: string };
       console.error('Failed to load visibility settings:', error);
       // Don't show error message for 404 - means no custom settings
       if (!error?.message?.includes('404')) {
@@ -81,7 +82,8 @@ const ProjectVisibilityControl: React.FC = () => {
           setTimeout(() => {
             window.location.reload();
           }, 1000);
-        } catch (error: any) {
+        } catch (err: unknown) {
+          const error = err as Error & { message?: string };
           console.error('Failed to reset visibility:', error);
           message.error(`Lỗi reset: ${error?.message || 'Unknown error'}`);
         } finally {

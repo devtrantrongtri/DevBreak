@@ -101,7 +101,13 @@ const MeetingsList: React.FC<MeetingsListProps> = ({
   }, [loadMeetings, loadProjects, projectId]);
 
   // Create meeting
-  const handleCreateMeeting = async (values: any) => {
+  const handleCreateMeeting = async (values: {
+    title: string;
+    description?: string;
+    scheduledAt: string;
+    duration: number;
+    type: 'video' | 'audio' | 'screen_share';
+  }) => {
     try {
       setCreating(true);
       

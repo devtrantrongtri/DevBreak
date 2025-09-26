@@ -33,7 +33,11 @@ interface ParticipantsListProps {
   meeting: Meeting;
   participants: SocketParticipant[];
   currentUserId?: string;
-  onParticipantUpdate?: (participantId: string, updates: any) => void;
+  onParticipantUpdate?: (participantId: string, updates: {
+    isMuted?: boolean;
+    isCameraOn?: boolean;
+    isScreenSharing?: boolean;
+  }) => void;
 }
 
 const ParticipantsList: React.FC<ParticipantsListProps> = ({ 
@@ -59,14 +63,18 @@ const ParticipantsList: React.FC<ParticipantsListProps> = ({
 
   // Handle participant actions
   const handleParticipantAction = async (
-    participantId: string, 
-    action: string, 
-    value?: any
+    participantId: string,
+    action: string,
+    value?: boolean
   ) => {
     try {
       setLoading(participantId);
-      
-      const updates: any = {};
+
+      const updates: {
+        isMuted?: boolean;
+        isCameraOn?: boolean;
+        isScreenSharing?: boolean;
+      } = {};
       
       switch (action) {
         case 'mute':

@@ -82,7 +82,7 @@ const GroupDetailsPage: React.FC = () => {
           <Space>
             <SafetyCertificateOutlined />
             <span>{permission.name}</span>
-            <Tag size="small">{permission.code}</Tag>
+            <Tag >{permission.code}</Tag>
           </Space>
         ),
         key: permission.code,

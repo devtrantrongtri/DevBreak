@@ -50,14 +50,17 @@ const TaskPreviewPopover: React.FC<TaskPreviewPopoverProps> = ({
         description: 'Không thể tải thông tin chi tiết task.',
         status: 'todo',
         priority: 'medium',
-        assigneeId: null,
-        assignee: null,
         createdBy: 'unknown',
+        creator: {
+          id: 'unknown',
+          displayName: 'Unknown User',
+          email: 'unknown@example.com'
+        },
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        dueDate: null,
-        estimatedHours: null,
-        actualHours: '0',
+        dueDate: undefined,
+        estimatedHours: undefined,
+        actualHours: 0,
         tags: [],
         isActive: true
       } as Task);
