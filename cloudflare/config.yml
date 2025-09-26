@@ -1,0 +1,14 @@
+tunnel: devbreak-tunnel
+credentials-file: /home/devtrantrongtri/.cloudflared/devbreak-tunnel.json
+
+ingress:
+  # Main application
+  - hostname: devtri.xyz
+    service: http://localhost:80
+  
+  # API subdomain (optional)
+  - hostname: api.devtri.xyz
+    service: http://localhost:80
+    
+  # Catch-all rule (required)
+  - service: http_status:404
