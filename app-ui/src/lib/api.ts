@@ -13,7 +13,7 @@ import {
   SeedResponse,
 } from '@/types/api';
 import { PaginatedActivityLogs, ActivityLog } from '@/types/activity-logs';
-import { Project, PMDashboardData, UserProgressData, Task } from '@/types/collab';
+import { Project, PMDashboardData, UserProgressData, Task, Daily } from '@/types/collab';
 import { DashboardStats, GrowthData, ActivityTrend } from '@/types/dashboard';
 import {
   Meeting,
@@ -22,7 +22,7 @@ import {
   JoinMeetingDto,
   UpdateParticipantDto,
   SendMessageDto,
-  Participant,
+  MeetingParticipant,
   MeetingMessage
 } from '@/types/meeting';
 
@@ -531,10 +531,10 @@ class ApiClient {
   }
 
   async updateParticipant(
-    meetingId: string, 
-    participantId: string, 
+    meetingId: string,
+    participantId: string,
     updateData: UpdateParticipantDto
-  ): Promise<Participant> {
+  ): Promise<MeetingParticipant> {
     return this.request(`/meetings/${meetingId}/participants/${participantId}`, {
       method: 'PATCH',
       data: updateData,

@@ -29,7 +29,7 @@ import {
   FolderOpenOutlined,
   SafetyCertificateOutlined
 } from '@ant-design/icons';
-import type { TreeDataNode, TreeProps } from 'antd/es/tree';
+import type { DataNode, TreeProps } from 'antd/es/tree';
 import type { MenuProps } from 'antd';
 import { PermissionResponse } from '@/types/api';
 
@@ -54,7 +54,7 @@ interface PermissionTreeViewProps {
   onRefresh?: () => void;
 }
 
-interface PermissionTreeNode extends TreeDataNode {
+interface PermissionTreeNode extends DataNode {
   key: string;
   title: React.ReactNode;
   children?: PermissionTreeNode[];

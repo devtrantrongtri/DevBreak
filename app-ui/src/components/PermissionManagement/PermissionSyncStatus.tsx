@@ -177,7 +177,6 @@ const PermissionSyncStatus: React.FC<PermissionSyncStatusProps> = ({
             type="warning"
             showIcon
             style={{ marginTop: 12 }}
-            size="small"
           />
         )}
       </Card>
@@ -227,8 +226,8 @@ const PermissionSyncStatus: React.FC<PermissionSyncStatusProps> = ({
                 title={
                   <Space>
                     <Text strong>{permission.name}</Text>
-                    <Tag color="blue" size="small">{permission.code}</Tag>
-                    <Tag color="green" size="small">{permission.module}</Tag>
+                    <Tag color="blue">{permission.code}</Tag>
+                    <Tag color="green">{permission.module}</Tag>
                   </Space>
                 }
                 description={
