@@ -23,21 +23,28 @@ const DailyForm: React.FC<DailyFormProps> = ({
   const [existingDaily, setExistingDaily] = useState<Daily | null>(null);
   const { currentProject, userRole } = useProject();
 
-  const reportDate = selectedDate || dayjs().format('YYYY-MM-DD');
+  // Đảm bảo date luôn là chuỗi với định dạng YYYY-MM-DD
+  // Sử dụng String() để đảm bảo luôn là chuỗi
+  const dateValue = String(selectedDate ? dayjs(selectedDate).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'));
+  console.log('Initial date value:', dateValue, 'Type:', typeof dateValue);
 
   // Load existing daily for the selected date
   useEffect(() => {
     if (currentProject) {
       loadExistingDaily();
     }
-  }, [currentProject, reportDate]);
+  }, [currentProject, dateValue]);
 
   const loadExistingDaily = async () => {
     if (!currentProject) return;
 
     try {
+      // Đảm bảo date query param là chuỗi với định dạng YYYY-MM-DD
+      const dateParam = String(dateValue);
+      console.log('Loading daily with date param:', dateParam);
+      
       const response = await apiClient.request<Daily[]>(
-        `/collab/dailies/my?date=${reportDate}`
+        `/collab/dailies/my?date=${dateParam}`
       );
       
       const daily = response.find(d => d.projectId === currentProject.id);
@@ -61,7 +68,6 @@ const DailyForm: React.FC<DailyFormProps> = ({
     yesterday: string;
     today: string;
     blockers: string;
-    reportDate: string;
   }) => {
     if (!currentProject) {
       notification.error({
@@ -100,23 +106,76 @@ const DailyForm: React.FC<DailyFormProps> = ({
         onSuccess?.(response);
       } else {
         // Create new daily
-        const createDto: CreateDailyDto = {
-          projectId: currentProject.id,
-          reportDate: reportDate,
-          yesterday: values.yesterday,
-          today: values.today,
-          blockers: values.blockers || '',
+        // Đảm bảo date là chuỗi với định dạng YYYY-MM-DD
+        // Sử dụng trực tiếp dateValue đã được format ở trên
+        console.log('Using date value:', dateValue, 'Type:', typeof dateValue);
+        
+        // Kiểm tra định dạng ngày trước khi gửi request
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!dateRegex.test(dateValue)) {
+          throw new Error(`Invalid date format: ${dateValue}. Expected format: YYYY-MM-DD`);
+        }
+        
+        // Tạo dữ liệu gửi đi với reportDate là chuỗi YYYY-MM-DD
+        // Sử dụng một cách tiếp cận khác để đảm bảo reportDate là chuỗi
+        
+        // Tạo object với date là chuỗi (thay vì reportDate để khớp với backend DTO)
+        const rawData = {
+          projectId: String(currentProject.id),
+          date: String(dateValue),  
+          yesterday: String(values.yesterday || ''),
+          today: String(values.today || ''),
+          blockers: String(values.blockers || ''),
         };
-
-        console.log('Sending daily data:', createDto);
-
-        const response = await apiClient.request<Daily>(
-          '/collab/dailies',
-          {
-            method: 'POST',
-            data: createDto,
+        
+        // Kiểm tra và in ra thông tin về dữ liệu
+        console.log('Raw data before sending:', rawData);
+        console.log('date value:', rawData.date);
+        console.log('date type:', typeof rawData.date);
+        
+        // Gửi request trực tiếp với dữ liệu JSON
+        // Tạo chuỗi JSON một cách thủ công để đảm bảo date là chuỗi
+        const manualJsonBody = `{
+          "projectId": "${currentProject.id}",
+          "date": "${dateValue}",
+          "yesterday": ${JSON.stringify(values.yesterday || '')},
+          "today": ${JSON.stringify(values.today || '')},
+          "blockers": ${JSON.stringify(values.blockers || '')}
+        }`;
+        
+        console.log('Manual JSON body:', manualJsonBody);
+        
+        const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/collab/dailies`;
+        const token = localStorage.getItem('accessToken');
+        
+        const fetchResponse = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: manualJsonBody
+        });
+        
+        // In ra response headers để kiểm tra
+        console.log('Response status:', fetchResponse.status);
+        console.log('Response headers:', Object.fromEntries([...fetchResponse.headers.entries()]));
+        
+        if (!fetchResponse.ok) {
+          const errorText = await fetchResponse.text();
+          console.error('Error response text:', errorText);
+          
+          try {
+            const errorData = JSON.parse(errorText);
+            console.error('Parsed error data:', errorData);
+            throw new Error(errorData.message || `HTTP error! status: ${fetchResponse.status}`);
+          } catch (parseError) {
+            console.error('Error parsing error response:', parseError);
+            throw new Error(`HTTP error! status: ${fetchResponse.status}. Response: ${errorText}`);
           }
-        );
+        }
+        
+        const response = await fetchResponse.json();
 
         notification.success({
           message: 'Thành công',
@@ -148,15 +207,16 @@ const DailyForm: React.FC<DailyFormProps> = ({
     );
   }
 
-  const isToday = reportDate === dayjs().format('YYYY-MM-DD');
-  const isPastDate = dayjs(reportDate).isBefore(dayjs(), 'day');
+  // Kiểm tra ngày hiện tại và ngày quá khứ
+  const isToday = dayjs(dateValue).format('YYYY-MM-DD') === dayjs().format('YYYY-MM-DD');
+  const isPastDate = dayjs(dateValue).isBefore(dayjs(), 'day');
 
   return (
     <div>
       <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
         <CalendarOutlined />
         <span style={{ fontWeight: 500 }}>
-          Daily Report - {dayjs(reportDate).format('DD/MM/YYYY')}
+          Daily Report - {dayjs(dateValue).format('DD/MM/YYYY')}
         </span>
         {isToday && (
           <span style={{ color: '#52c41a', fontSize: '12px' }}>(Hôm nay)</span>

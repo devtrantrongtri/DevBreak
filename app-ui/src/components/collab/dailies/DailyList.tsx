@@ -31,21 +31,22 @@ const DailyList: React.FC<DailyListProps> = ({
   const [filterType, setFilterType] = useState<string>('all'); // all, with_blockers, no_blockers
   
   const { currentProject } = useProject();
-  const reportDate = selectedDate || dayjs().format('YYYY-MM-DD');
+  // Đổi tên biến từ reportDate thành dateParam để tránh nhầm lẫn với trường date trong Daily
+  const dateParam = selectedDate || dayjs().format('YYYY-MM-DD');
 
   // Load dailies when project or date changes
   useEffect(() => {
     if (currentProject) {
       loadDailies();
     }
-  }, [currentProject, reportDate]);
+  }, [currentProject, dateParam]);
 
   const loadDailies = async () => {
     if (!currentProject) return;
 
     try {
       setLoading(true);
-      const url = `/collab/dailies?projectId=${currentProject.id}&date=${reportDate}`;
+      const url = `/collab/dailies?projectId=${currentProject.id}&date=${dateParam}`;
       console.log('[DailyList] Loading dailies from:', url);
 
       const response = await apiClient.request<Daily[]>(url);
@@ -134,11 +135,11 @@ const DailyList: React.FC<DailyListProps> = ({
         totalDailies: dailies.length,
         filteredDailies: filteredDailies.length,
         currentProject: currentProject?.name,
-        reportDate,
+        dateParam,
         searchText,
         filterUser,
         filterType,
-        apiUrl: `/collab/dailies?projectId=${currentProject?.id}&date=${reportDate}`,
+        apiUrl: `/collab/dailies?projectId=${currentProject?.id}&date=${dateParam}`,
         sampleDaily: dailies[0],
         // Check filter states
         filterStates: {
@@ -153,7 +154,7 @@ const DailyList: React.FC<DailyListProps> = ({
         console.warn('[DailyList] ⚠️ Have dailies but no filtered results! Check filter logic.');
       }
     }
-  }, [dailies, filteredDailies, currentProject, reportDate, searchText, filterUser, filterType]);
+  }, [dailies, filteredDailies, currentProject, dateParam, searchText, filterUser, filterType]);
 
   // Get unique users for filter
   const users = Array.from(new Set(dailies.map(d => d.userId)))
@@ -228,7 +229,7 @@ const DailyList: React.FC<DailyListProps> = ({
                   </span>
                 )}
                 <span>
-                  <CalendarOutlined /> {dayjs(reportDate).format('DD/MM/YYYY')}
+                  <CalendarOutlined /> {dayjs(dateParam).format('DD/MM/YYYY')}
                 </span>
               </Space>
             </div>

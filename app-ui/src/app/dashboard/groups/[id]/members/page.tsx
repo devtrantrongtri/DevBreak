@@ -14,6 +14,7 @@ import {
   message,
   Breadcrumb,
   Spin,
+  App,
 } from 'antd';
 import {
   UserOutlined,
@@ -46,6 +47,7 @@ export default function GroupMembersPage() {
   const params = useParams();
   const router = useRouter();
   const { user } = useAuth();
+  const { modal, message: messageApi } = App.useApp();
   const groupId = params.id as string;
 
   const [group, setGroup] = useState<Group | null>(null);
@@ -90,7 +92,7 @@ export default function GroupMembersPage() {
 
   const handleAddUsers = async () => {
     if (selectedUserIds.length === 0) {
-      message.warning('Please select at least one user');
+      messageApi.warning('Please select at least one user');
       return;
     }
 
@@ -103,32 +105,52 @@ export default function GroupMembersPage() {
           removeUserIds: [], // Empty array for remove
         }
       });
-      message.success('Users added successfully');
+      messageApi.success('Users added successfully');
       setAddModalVisible(false);
       setSelectedUserIds([]);
       fetchGroupDetails();
     } catch (error) {
       console.error('Error adding users:', error);
-      message.error('Failed to add users');
+      messageApi.error('Failed to add users');
     } finally {
       setActionLoading(false);
     }
   };
 
   const handleRemoveUser = async (userId: string) => {
-    Modal.confirm({
+    modal.confirm({
       title: 'Remove User',
       content: 'Are you sure you want to remove this user from the group?',
       onOk: async () => {
         try {
-          await apiClient.request(`/groups/${groupId}/users/${userId}`, {
-            method: 'DELETE'
+          console.log(`[GroupMembers] Removing user ${userId} from group ${groupId}`);
+          
+          // Sử dụng API mới với POST method và body
+          await apiClient.request(`/groups/${groupId}/users`, {
+            method: 'POST',
+            data: {
+              addUserIds: [], // Empty array for add
+              removeUserIds: [userId], // User to remove
+            }
           });
-          message.success('User removed successfully');
+          
+          messageApi.success('User removed successfully');
+          
+          // Xóa cache quyền của user bị remove
+          try {
+            await apiClient.request('/auth/debug/clear-cache', {
+              method: 'POST'
+            });
+            console.log('[GroupMembers] Cache cleared for removed user');
+          } catch (cacheError) {
+            console.error('[GroupMembers] Failed to clear cache:', cacheError);
+          }
+          
+          // Refresh group details
           fetchGroupDetails();
         } catch (error) {
           console.error('Error removing user:', error);
-          message.error('Failed to remove user');
+          messageApi.error('Failed to remove user');
         }
       },
     });

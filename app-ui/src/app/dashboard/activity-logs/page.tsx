@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Card,
   Typography,
@@ -33,7 +33,7 @@ const ActivityLogsPage: React.FC = () => {
     total: 0,
   });
 
-  const fetchActivityLogs = async (newFilters?: FilterType, page?: number, pageSize?: number) => {
+  const fetchActivityLogs = useCallback(async (newFilters?: FilterType, page?: number, pageSize?: number) => {
     setLoading(true);
     try {
       // Prepare params object for API call
@@ -65,7 +65,7 @@ const ActivityLogsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const handleFilter = (newFilters: FilterType) => {
     setFilters(newFilters);
