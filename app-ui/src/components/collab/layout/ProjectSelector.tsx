@@ -99,7 +99,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
                   <ProjectOutlined />
                   <Text strong>{project.name}</Text>
                 </Space>
-                <Tag color={getStatusColor(project.status)} size="small">
+                <Tag color={getStatusColor(project.status)} style={{ fontSize: '12px', padding: '0 6px' }}>
                   {PROJECT_STATUSES[project.status as keyof typeof PROJECT_STATUSES]}
                 </Tag>
               </div>
@@ -137,7 +137,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
           <Text type="secondary" style={{ fontSize: '12px' }}>
             Vai trò:
           </Text>
-          <Tag color={getRoleColor(userRole)} size="small">
+          <Tag color={getRoleColor(userRole)} style={{ fontSize: '12px', padding: '0 6px' }}>
             {PROJECT_ROLES[userRole as keyof typeof PROJECT_ROLES]}
           </Tag>
         </div>

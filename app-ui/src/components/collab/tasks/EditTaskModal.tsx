@@ -83,7 +83,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
         assignedTo: task.assignedTo,
         dueDate: task.dueDate ? dayjs(task.dueDate) : null,
         estimatedHours: task.estimatedHours,
-        actualHours: parseFloat(task.actualHours || '0')
+        actualHours: task.actualHours !== undefined ? task.actualHours : 0
       });
     }
   }, [task, visible, form]);
@@ -105,8 +105,9 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
     status: 'todo' | 'in_progress' | 'review' | 'done';
     priority: 'low' | 'medium' | 'high' | 'urgent';
     assignedTo?: string;
-    dueDate?: string;
+    dueDate?: any; // dayjs object
     estimatedHours?: number;
+    actualHours?: number;
   }) => {
     if (!task) return;
 
@@ -114,7 +115,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
     try {
       const updateData = {
         ...values,
-        dueDate: values.dueDate ? values.dueDate.format('YYYY-MM-DD') : null,
+        dueDate: values.dueDate && typeof values.dueDate.format === 'function' ? values.dueDate.format('YYYY-MM-DD') : null,
         actualHours: values.actualHours?.toString() || '0'
       };
 
@@ -391,7 +392,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
             showSearch
             style={{ fontSize: '13px' }}
             filterOption={(input, option) =>
-              (option?.children as string)?.toLowerCase().includes(input.toLowerCase())
+              (option?.children as unknown as string)?.toLowerCase().includes(input.toLowerCase())
             }
           >
             {members.map(member => (

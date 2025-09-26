@@ -58,7 +58,7 @@ const PermissionStats: React.FC<PermissionStatsProps> = ({ permissions }) => {
             prefix={<RobotOutlined style={{ color: '#52c41a' }} />}
             valueStyle={{ color: '#52c41a' }}
             suffix={
-              <Tag color="green" size="small">
+              <Tag color="green">
                 {stats.total > 0 ? Math.round((stats.autoDiscovered / stats.total) * 100) : 0}%
               </Tag>
             }
@@ -74,7 +74,7 @@ const PermissionStats: React.FC<PermissionStatsProps> = ({ permissions }) => {
             prefix={<UserOutlined style={{ color: '#fa8c16' }} />}
             valueStyle={{ color: '#fa8c16' }}
             suffix={
-              <Tag color="orange" size="small">
+              <Tag color="orange">
                 {stats.total > 0 ? Math.round((stats.manual / stats.total) * 100) : 0}%
               </Tag>
             }
@@ -91,8 +91,8 @@ const PermissionStats: React.FC<PermissionStatsProps> = ({ permissions }) => {
             valueStyle={{ color: '#722ed1', fontSize: '20px' }}
             suffix={
               <Space size={4}>
-                <Tag color="purple" size="small">Root</Tag>
-                <Tag color="geekblue" size="small">Child</Tag>
+                <Tag color="purple">Root</Tag>
+                <Tag color="geekblue">Child</Tag>
               </Space>
             }
           />
@@ -108,8 +108,8 @@ const PermissionStats: React.FC<PermissionStatsProps> = ({ permissions }) => {
             valueStyle={{ color: '#52c41a', fontSize: '20px' }}
             suffix={
               <Space size={4}>
-                <Tag color="success" size="small">Hoạt động</Tag>
-                <Tag color="default" size="small">Tạm dừng</Tag>
+                <Tag color="success">Hoạt động</Tag>
+                <Tag color="default">Tạm dừng</Tag>
               </Space>
             }
           />

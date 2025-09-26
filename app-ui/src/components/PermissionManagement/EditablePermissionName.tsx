@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Input, Typography, Button, Space, message } from 'antd';
+import type { InputRef } from 'antd';
 import { EditOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
 
 const { Text } = Typography;
@@ -24,7 +25,7 @@ const EditablePermissionName: React.FC<EditablePermissionNameProps> = ({
   const [editing, setEditing] = useState(false);
   const [inputValue, setInputValue] = useState(value);
   const [loading, setSaving] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<InputRef>(null);
 
   useEffect(() => {
     setInputValue(value);

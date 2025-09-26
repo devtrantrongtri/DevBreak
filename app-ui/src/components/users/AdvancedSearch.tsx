@@ -61,15 +61,16 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
     searchText?: string;
     status?: string;
     groups?: string[];
-    dateRange?: [string, string];
+    dateRange?: [dayjs.Dayjs, dayjs.Dayjs];
+    createdDateRange?: [dayjs.Dayjs, dayjs.Dayjs];
     roles?: string[];
   }) => {
     const filters: SearchFilters = {
       searchText: values.searchText?.trim(),
       status: values.status,
       groups: values.groups,
-      dateRange: values.dateRange,
-      createdDateRange: values.createdDateRange,
+      dateRange: values.dateRange || null,
+      createdDateRange: values.createdDateRange || null,
     };
 
     // Track active filters for display
@@ -94,23 +95,23 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
     switch (key) {
       case 'text':
         return <Tag key={key} closable onClose={() => handleRemoveFilter(key)}>
-          Tìm kiếm: &quot;{value}&quot;
+          Tìm kiếm: &quot;{String(value)}&quot;
         </Tag>;
       case 'status':
         return <Tag key={key} closable onClose={() => handleRemoveFilter(key)} color="blue">
-          Trạng thái: {value === 'active' ? 'Hoạt động' : 'Không hoạt động'}
+          Trạng thái: {String(value) === 'active' ? 'Hoạt động' : 'Không hoạt động'}
         </Tag>;
       case 'groups':
         return <Tag key={key} closable onClose={() => handleRemoveFilter(key)} color="green">
-          Nhóm: {value.length} nhóm đã chọn
+          Nhóm: {Array.isArray(value) ? value.length : 0} nhóm đã chọn
         </Tag>;
       case 'dateRange':
         return <Tag key={key} closable onClose={() => handleRemoveFilter(key)} color="orange">
-          Cập nhật: {value[0].format('DD/MM/YYYY')} - {value[1].format('DD/MM/YYYY')}
+          Cập nhật: {Array.isArray(value) && value[0]?.format ? `${value[0].format('DD/MM/YYYY')} - ${value[1].format('DD/MM/YYYY')}` : 'Không xác định'}
         </Tag>;
       case 'createdDateRange':
         return <Tag key={key} closable onClose={() => handleRemoveFilter(key)} color="purple">
-          Tạo: {value[0].format('DD/MM/YYYY')} - {value[1].format('DD/MM/YYYY')}
+          Tạo: {Array.isArray(value) && value[0]?.format ? `${value[0].format('DD/MM/YYYY')} - ${value[1].format('DD/MM/YYYY')}` : 'Không xác định'}
         </Tag>;
       default:
         return null;
@@ -204,7 +205,7 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
                 <FilterOutlined />
                 <Text>Bộ lọc nâng cao</Text>
                 {activeFilters.length > 0 && (
-                  <Tag color="blue" size="small">
+                  <Tag color="blue">
                     {activeFilters.length} bộ lọc
                   </Tag>
                 )}
@@ -221,9 +222,20 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
                     allowClear
                     showSearch
                     size="small"
-                    filterOption={(input, option) =>
-                      (option?.children as string)?.toLowerCase().includes(input.toLowerCase())
-                    }
+                    filterOption={(input, option) => {
+                      const children = option?.children as any;
+                      if (typeof children === 'string') {
+                        return children.toLowerCase().includes(input.toLowerCase());
+                      }
+                      // Handle complex children (like Space component with text)
+                      if (children?.props?.children) {
+                        const textContent = Array.isArray(children.props.children)
+                          ? children.props.children.find((child: any) => typeof child === 'string')
+                          : children.props.children;
+                        return typeof textContent === 'string' && textContent.toLowerCase().includes(input.toLowerCase());
+                      }
+                      return false;
+                    }}
                   >
                     {groups.map(group => (
                       <Option key={group.id} value={group.id}>

@@ -74,6 +74,9 @@ const ParticipantsList: React.FC<ParticipantsListProps> = ({
         isMuted?: boolean;
         isCameraOn?: boolean;
         isScreenSharing?: boolean;
+        canSpeak?: boolean;
+        isVideoEnabled?: boolean;
+        role?: 'host' | 'co-host' | 'participant' | 'viewer';
       } = {};
       
       switch (action) {

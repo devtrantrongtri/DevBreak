@@ -87,7 +87,7 @@ const ActivityDebug: React.FC<ActivityDebugProps> = ({ show = false }) => {
             <Col span={12}>
               <Statistic 
                 title="Cache Size" 
-                value={cacheStats?.size || 0} 
+                value={cacheStats?.totalEntries || 0} 
                 suffix="entries"
               />
             </Col>
@@ -111,10 +111,10 @@ const ActivityDebug: React.FC<ActivityDebugProps> = ({ show = false }) => {
                     </Tag>
                   </Space>
                   <Text type="secondary" style={{ fontSize: '12px' }}>
-                    Data: {entry.dataLength} items
+                    Hits: {entry.hitCount} times
                   </Text>
                   <Text type="secondary" style={{ fontSize: '12px' }}>
-                    Age: {Math.round((Date.now() - entry.timestamp) / 1000)}s
+                    Last accessed: {new Date(entry.lastAccessed).toLocaleTimeString()}
                   </Text>
                 </Space>
               </div>

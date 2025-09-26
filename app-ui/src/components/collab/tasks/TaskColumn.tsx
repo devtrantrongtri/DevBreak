@@ -46,7 +46,7 @@ const TaskColumn: React.FC<TaskColumnProps> = ({
     if (canPerformAction('assign_task')) return true;
     
     // DEV can move their assigned tasks
-    if (canPerformAction('update_assigned_task') && task.assigneeId) {
+    if (canPerformAction('update_assigned_task') && task.assignedTo) {
       return true; // Would need to check if current user is assignee
     }
     

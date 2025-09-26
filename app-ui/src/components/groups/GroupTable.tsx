@@ -46,7 +46,7 @@ const GroupTable: React.FC<GroupTableProps> = ({
   } : undefined;
 
   return (
-    <FixedHeightTable
+    <FixedHeightTable<GroupResponse>
       columns={columns}
       dataSource={groups}
       rowKey="id"

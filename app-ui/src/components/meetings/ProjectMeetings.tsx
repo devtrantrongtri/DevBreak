@@ -94,7 +94,23 @@ const ProjectMeetings: React.FC<ProjectMeetingsProps> = ({
       console.log('Loading project members for project:', projectId);
       const membersData = await apiClient.getProjectMembers(projectId);
       console.log('Project members loaded:', membersData);
-      setProjectMembers(membersData);
+
+      // Transform UserResponse[] to ProjectMember[]
+      const transformedMembers: ProjectMember[] = membersData.map((user, index) => ({
+        id: `member-${user.id}`,
+        projectId: projectId,
+        userId: user.id,
+        role: 'DEV' as const, // Default role, should be determined by actual project membership
+        joinedAt: user.createdAt, // Use user creation date as fallback
+        user: {
+          id: user.id,
+          email: user.email,
+          displayName: user.displayName,
+          isActive: user.isActive
+        }
+      }));
+
+      setProjectMembers(transformedMembers);
     } catch (error) {
       console.error('Error loading project members:', error);
       // Fallback with mock data for testing
@@ -139,10 +155,12 @@ const ProjectMeetings: React.FC<ProjectMeetingsProps> = ({
   const handleCreateMeeting = async (values: {
     title: string;
     description?: string;
-    scheduledAt: string;
-    duration: number;
+    timeRange: [dayjs.Dayjs, dayjs.Dayjs];
     type: 'video' | 'audio' | 'screen_share';
-    participants?: string[];
+    participantIds?: string[];
+    isRecurring?: boolean;
+    maxParticipants?: number;
+    allowRecording?: boolean;
   }) => {
     try {
       setCreating(true);

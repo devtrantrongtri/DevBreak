@@ -251,7 +251,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
             allowClear
             showSearch
             filterOption={(input, option) =>
-              (option?.children as string)?.toLowerCase().includes(input.toLowerCase())
+              (option?.children as unknown as string)?.toLowerCase().includes(input.toLowerCase())
             }
           >
             {members.map(member => (

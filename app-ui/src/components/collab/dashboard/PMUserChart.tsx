@@ -237,9 +237,11 @@ const PMUserChart: React.FC<PMUserChartProps> = ({
                 paddingAngle={2}
                 dataKey="value"
               >
-                {chartData.map((entry: { name: string; value: number; color: string }, index: number) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
+                {chartData.map((entry, index) => {
+                  // Type assertion for status chart data
+                  const statusEntry = entry as { name: string; value: number; color: string };
+                  return <Cell key={`cell-${index}`} fill={statusEntry.color} />;
+                })}
               </Pie>
               <Tooltip 
                 formatter={(value: number, name: string) => [`${value}`, name]}
@@ -267,9 +269,11 @@ const PMUserChart: React.FC<PMUserChartProps> = ({
                 fill={COLORS.primary}
                 radius={[4, 4, 0, 0]}
               >
-                {chartData.map((entry: { name: string; value: number; color: string }, index: number) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
+                {chartData.map((entry, index) => {
+                  // Type assertion for workload chart data
+                  const workloadEntry = entry as { name: string; value: number; color: string };
+                  return <Cell key={`cell-${index}`} fill={workloadEntry.color} />;
+                })}
               </Bar>
             </BarChart>
           </ResponsiveContainer>

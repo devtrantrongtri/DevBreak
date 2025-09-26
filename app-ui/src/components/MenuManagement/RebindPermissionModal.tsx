@@ -80,10 +80,21 @@ const RebindPermissionModal: React.FC<RebindPermissionModalProps> = ({
             placeholder="Chọn quyền truy cập"
             showSearch
             optionFilterProp="children"
-            filterOption={(input, option) =>
-              (option?.children as React.ReactElement)?.props?.children?.[0]?.toLowerCase().includes(input.toLowerCase()) ||
-              (option?.children as React.ReactElement)?.props?.children?.[1]?.props?.children?.toLowerCase().includes(input.toLowerCase())
-            }
+            filterOption={(input, option) => {
+              const children = option?.children as any;
+              if (!children?.props?.children) return false;
+
+              const childrenArray = children.props.children;
+              if (!Array.isArray(childrenArray)) return false;
+
+              // Search in permission name (first element)
+              const nameMatch = childrenArray[0]?.toLowerCase?.()?.includes(input.toLowerCase()) || false;
+
+              // Search in permission code (second element - Tag component)
+              const codeMatch = childrenArray[1]?.props?.children?.toLowerCase?.()?.includes(input.toLowerCase()) || false;
+
+              return nameMatch || codeMatch;
+            }}
           >
             {permissions.map(permission => (
               <Select.Option key={permission.code} value={permission.code}>
