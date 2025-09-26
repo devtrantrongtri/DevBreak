@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, Input, App } from 'antd';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
@@ -26,7 +26,7 @@ const GroupsPage: React.FC = () => {
   const canDeleteGroup = permissions.includes('group.delete');
   const canAssignPermissions = permissions.includes('group.assignPermissions');
 
-  const fetchGroups = async () => {
+  const fetchGroups = useCallback(async () => {
     try {
       setLoading(true);
       const response = await apiClient.getGroups();
@@ -37,11 +37,11 @@ const GroupsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [message]);  // Thêm message vào dependency array của useCallback
 
   useEffect(() => {
     fetchGroups();
-  }, [fetchGroups]);
+  }, [fetchGroups]);  // Bây giờ an toàn vì fetchGroups đã được memoize
 
   const handleDelete = async (groupId: string) => {
     try {

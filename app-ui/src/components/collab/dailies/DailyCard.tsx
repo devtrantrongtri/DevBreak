@@ -21,8 +21,8 @@ const DailyCard: React.FC<DailyCardProps> = ({
   compact = false
 }) => {
   const hasBlockers = daily.blockers && daily.blockers.trim().length > 0;
-  const isToday = dayjs(daily.reportDate).isSame(dayjs(), 'day');
-  const isYesterday = dayjs(daily.reportDate).isSame(dayjs().subtract(1, 'day'), 'day');
+  const isToday = dayjs(daily.date).isSame(dayjs(), 'day');
+  const isYesterday = dayjs(daily.date).isSame(dayjs().subtract(1, 'day'), 'day');
 
   // Handle task mention clicks
   const handleTaskMentionClick = (event: React.MouseEvent) => {
@@ -41,7 +41,7 @@ const DailyCard: React.FC<DailyCardProps> = ({
   const getDateLabel = () => {
     if (isToday) return 'Hôm nay';
     if (isYesterday) return 'Hôm qua';
-    return dayjs(daily.reportDate).format('DD/MM/YYYY');
+    return dayjs(daily.date).format('DD/MM/YYYY');
   };
 
   return (

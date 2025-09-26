@@ -89,7 +89,7 @@ export interface Daily {
   id: string;
   projectId: string;
   userId: string;
-  reportDate: string;
+  date: string;  
   yesterday?: string;
   today?: string;
   blockers?: string;
@@ -193,13 +193,13 @@ export interface UpdateTaskDto extends Partial<CreateTaskDto> {
 
 export interface CreateDailyDto {
   projectId: string;
-  reportDate: string;
+  date: string;  
   yesterday?: string;
   today?: string;
   blockers?: string;
 }
 
-export type UpdateDailyDto = Partial<Omit<CreateDailyDto, 'projectId' | 'reportDate'>>;
+export type UpdateDailyDto = Partial<Omit<CreateDailyDto, 'projectId' | 'date'>>;  
 
 // UI Types
 export interface DashboardSection {

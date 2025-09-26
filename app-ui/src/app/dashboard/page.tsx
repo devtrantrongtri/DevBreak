@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import SystemCharts from '@/components/dashboard/SystemCharts';
 import ActivityLogs from '@/components/dashboard/ActivityLogs';
+import WelcomePanel from '@/components/dashboard/WelcomePanel';
 // ActivityDebug component (có thể xóa nếu không cần)
 import { useTranslation } from 'react-i18next';
 
@@ -16,6 +17,9 @@ const Dashboard: React.FC = () => {
   const { user, permissions } = useAuth();
   const router = useRouter();
   const [showDebug, setShowDebug] = React.useState(false);
+  
+  // Kiểm tra người dùng có quyền xem dashboard.stats không
+  const hasDashboardStatsPermission = permissions.includes('dashboard.stats');
 
   // Toggle debug panel with Ctrl+Shift+D
   React.useEffect(() => {
@@ -28,6 +32,11 @@ const Dashboard: React.FC = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+  
+  // Nếu người dùng không có quyền dashboard.stats, hiển thị WelcomePanel
+  if (!hasDashboardStatsPermission) {
+    return <WelcomePanel user={user} permissions={permissions} />;
+  }
 
   return (
     <div>

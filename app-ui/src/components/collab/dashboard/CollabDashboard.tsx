@@ -26,13 +26,13 @@ const { Title } = Typography;
 
 // Define dashboard sections based on user roles
 const DASHBOARD_SECTIONS: DashboardSection[] = [
-  {
-    id: 'pm-daily-dashboard',
-    title: 'PM Daily Dashboard',
-    component: PMDailyReportWrapper,
-    roles: ['PM'], // Default roles, but can be overridden by component visibility settings
-    span: 2
-  },
+  // {
+  //   id: 'pm-daily-dashboard',
+  //   title: 'PM Daily Dashboard',
+  //   component: PMDailyReportWrapper,
+  //   roles: ['PM'], // Default roles, but can be overridden by component visibility settings
+  //   span: 2
+  // },
   {
     id: 'daily-reports',
     title: 'Daily Reports',

@@ -1,5 +1,7 @@
 import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { RbacService } from './rbac.service';
@@ -13,6 +15,8 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private rbacService: RbacService,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
@@ -42,9 +46,32 @@ export class AuthService {
   }
 
   async getMe(userId: string): Promise<MeResponseDto> {
+    console.log(`[AUTH] Getting user profile for userId: ${userId}`);
     const user = await this.usersService.findOne(userId);
+    console.log(`[AUTH] User found:`, { id: user.id, email: user.email, displayName: user.displayName });
+    
+    // Get user's groups for debugging
+    try {
+      const userWithGroups = await this.userRepository.findOne({
+        where: { id: userId },
+        relations: ['groups'],
+      });
+      
+      if (userWithGroups && userWithGroups.groups) {
+        console.log(`[AUTH] User groups:`, userWithGroups.groups.map(g => ({ id: g.id, name: g.name, isActive: g.isActive })));
+      } else {
+        console.log(`[AUTH] User has no groups`);
+      }
+    } catch (error) {
+      console.error(`[AUTH] Error fetching user groups:`, error);
+    }
+    
     const effectivePermissions = await this.rbacService.getEffectivePermissions(userId);
+    console.log(`[AUTH] Effective permissions count: ${effectivePermissions.length}`);
+    console.log(`[AUTH] Effective permissions:`, effectivePermissions);
+    
     const menuTree = await this.rbacService.getFilteredMenuTree(userId);
+    console.log(`[AUTH] Menu tree count: ${menuTree.length}`);
 
     return {
       user: this.mapToUserProfile(user),

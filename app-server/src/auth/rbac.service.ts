@@ -27,39 +27,71 @@ export class RbacService {
    * Union of all permissions from all groups the user belongs to
    */
   async getEffectivePermissions(userId: string): Promise<string[]> {
+    console.log(`[RBAC] Getting effective permissions for userId: ${userId}`);
     const cacheKey = `${this.PERMISSIONS_CACHE_PREFIX}${userId}`;
 
     // Try to get from cache first
     const cached = await this.cacheManager.get<string[]>(cacheKey);
     if (cached) {
+      console.log(`[RBAC] Using cached permissions for userId: ${userId}, count: ${cached.length}`);
       return cached;
     }
 
+    console.log(`[RBAC] Cache miss for userId: ${userId}, fetching from database`);
     const user = await this.userRepository.findOne({
       where: { id: userId },
       relations: ['groups', 'groups.permissions'],
     });
 
     if (!user) {
+      console.log(`[RBAC] User not found: ${userId}`);
       return [];
     }
 
+    console.log(`[RBAC] User found: ${user.email}, groups count: ${user.groups?.length || 0}`);
+
     // Collect all permission codes from all groups
     const permissionCodes = new Set<string>();
+    const groupDetails: Array<{
+      id: string;
+      name: string;
+      isActive: boolean;
+      permissionCount: number;
+      permissions: string[];
+    }> = [];
 
     for (const group of user.groups) {
+      const groupPermissions: string[] = [];
       if (group.isActive) { // Only consider active groups
+        console.log(`[RBAC] Processing active group: ${group.name} (${group.id})`);
         for (const permission of group.permissions) {
           if (permission.isActive) {
             permissionCodes.add(permission.code);
+            groupPermissions.push(permission.code);
           }
         }
+      } else {
+        console.log(`[RBAC] Skipping inactive group: ${group.name} (${group.id})`);
       }
+      groupDetails.push({
+        id: group.id,
+        name: group.name,
+        isActive: group.isActive,
+        permissionCount: groupPermissions.length,
+        permissions: groupPermissions
+      });
     }
+
+    console.log(`[RBAC] Group details:`, groupDetails);
+    console.log(`[RBAC] Raw permission codes count: ${permissionCodes.size}`);
+    console.log(`[RBAC] Raw permission codes:`, Array.from(permissionCodes));
 
     // Apply parent-child rules: only include child permissions if parent exists
     const normalizedPermissions = this.normalizePermissions(Array.from(permissionCodes));
 
+    console.log(`[RBAC] Normalized permissions count: ${normalizedPermissions.length}`);
+    console.log(`[RBAC] Normalized permissions:`, normalizedPermissions);
+    
     // Cache the result
     await this.cacheManager.set(cacheKey, normalizedPermissions, this.CACHE_TTL);
 

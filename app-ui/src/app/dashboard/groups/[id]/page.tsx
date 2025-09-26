@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Card,
   Descriptions,
@@ -43,13 +43,7 @@ const GroupDetailsPage: React.FC = () => {
   const canUpdateGroup = permissions.includes('group.update');
   const canAssignPermissions = permissions.includes('group.assignPermissions');
 
-  useEffect(() => {
-    if (groupId) {
-      fetchGroupDetails();
-    }
-  }, [groupId]);
-
-  const fetchGroupDetails = async () => {
+  const fetchGroupDetails = useCallback(async () => {
     try {
       setLoading(true);
       const response = await apiClient.getGroups();
@@ -64,7 +58,15 @@ const GroupDetailsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [groupId, router]);
+
+  useEffect(() => {
+    if (groupId) {
+      fetchGroupDetails();
+    }
+  }, [groupId, fetchGroupDetails]);
+
+  // fetchGroupDetails đã được chuyển lên trên useEffect
 
   const buildPermissionTree = (permissions: PermissionResponse[]): DataNode[] => {
     const permissionMap = new Map<string, PermissionResponse>();
