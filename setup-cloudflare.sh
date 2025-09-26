@@ -70,20 +70,15 @@ mkdir -p /home/devtrantrongtri/.cloudflared
 
 # Create tunnel configuration
 print_status "Creating tunnel configuration..."
-cat > /home/devtrantrongtri/.cloudflared/config.yml << EOF
-tunnel: $TUNNEL_ID
-credentials-file: /home/devtrantrongtri/.cloudflared/$TUNNEL_ID.json
+cat > /home/devtrantrongtri/.cloudflared/config.yml << 'EOF'
+tunnel: 4b772a17-651c-437a-bc61-cfd699523e42
+credentials-file: /home/devtrantrongtri/.cloudflared/4b772a17-651c-437a-bc61-cfd699523e42.json
 
 ingress:
-  # Main application
-  - hostname: $DOMAIN
+  - hostname: devtri.xyz
     service: http://localhost:80
-  
-  # API subdomain (optional)
-  - hostname: api.$DOMAIN
+  - hostname: api.devtri.xyz
     service: http://localhost:80
-    
-  # Catch-all rule (required)
   - service: http_status:404
 EOF
 
