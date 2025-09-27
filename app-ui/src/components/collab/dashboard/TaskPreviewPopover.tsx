@@ -12,7 +12,6 @@ import {
 import { format, addDays, isBefore, startOfDay } from 'date-fns';
 import { Task, TASK_PRIORITIES, TASK_STATUSES } from '@/types/collab';
 import { apiClient } from '@/lib/api';
-import { mockTasks } from '@/data/mockPMDashboardData';
 
 const { Text, Paragraph } = Typography;
 
