@@ -1,14 +1,16 @@
-tunnel: devbreak-tunnel
-credentials-file: /home/devtrantrongtri/.cloudflared/devbreak-tunnel.json
+tunnel: 4b772a17-651c-437a-bc61-cfd699523e42
+credentials-file: /home/devtrantrongtri/.cloudflared/4b772a17-651c-437a-bc61-cfd699523e42.json
 
 ingress:
-  # Main application
+  # Frontend (Next.js)
   - hostname: devtri.xyz
     service: http://localhost:80
-  
-  # API subdomain (optional)
+    originRequest:
+      httpHostHeader: devtri.xyz
+  # Backend API (NestJS)
   - hostname: api.devtri.xyz
     service: http://localhost:80
-    
+    originRequest:
+      httpHostHeader: api.devtri.xyz
   # Catch-all rule (required)
   - service: http_status:404
