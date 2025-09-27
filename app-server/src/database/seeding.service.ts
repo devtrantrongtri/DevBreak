@@ -6,6 +6,7 @@ import { User, Group, Permission, Menu } from '../entities';
 import { seedCollabData } from '../collab/seed-collab-data';
 import { SeedGroupsUsersService } from './seed-groups-users.service';
 import { MenusService } from '../menus/menus.service';
+import { CollabPermissionsService } from '../collab/seed-collab-permissions';
 
 @Injectable()
 export class SeedingService {
@@ -21,12 +22,14 @@ export class SeedingService {
     private dataSource: DataSource,
     private seedGroupsUsersService: SeedGroupsUsersService,
     private menusService: MenusService,
+    private collabPermissionsService: CollabPermissionsService,
   ) {}
 
   async seedAll(): Promise<void> {
     console.log('🌱 Starting database seeding...');
 
     await this.seedPermissions();
+    await this.collabPermissionsService.seedCollabPermissions();
     await this.menusService.seedMenus();
     await this.seedGroupsUsersService.seedGroupsAndUsers();
     await seedCollabData(this.dataSource);
