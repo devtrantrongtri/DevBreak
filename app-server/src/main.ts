@@ -8,10 +8,19 @@ async function bootstrap() {
 
   // Enable CORS for frontend
   app.enableCors({
-    origin: ['http://localhost:3001', 'http://localhost:3000', 'http://localhost:6969','https://devtri.xyz','https://api.devtri.xyz'],
+    origin: [
+      'http://localhost:3001', 
+      'http://localhost:3000', 
+      'http://localhost:6969',
+      'https://devtri.xyz',
+      'https://api.devtri.xyz',
+      /\.devtri\.xyz$/  // Allow all subdomains
+    ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    exposedHeaders: ['Content-Disposition'],
+    maxAge: 86400, // 24 hours in seconds
   });
 
   // Enable input validation globally
