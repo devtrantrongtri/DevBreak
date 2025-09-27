@@ -47,6 +47,10 @@ services:
       - DB_USERNAME=admin
       - DB_PASSWORD=password
       - DB_DATABASE=user_management
+      - JWT_SECRET=your-super-secret-jwt-key-change-this-in-production-2024
+      - JWT_EXPIRES_IN=2100h
+      - PORT=3000
+      - API_URL=http://localhost:3000
       # Redis tạm thời comment out
       # - REDIS_HOST=redis
       # - REDIS_PORT=6379
