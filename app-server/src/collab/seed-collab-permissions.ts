@@ -41,16 +41,85 @@ export class CollabPermissionsService {
       // Summary
       { code: 'collab.summary', name: 'Summary Module', description: 'Base summary module access', parentCode: 'collab' },
       { code: 'collab.summary.view', name: 'View Summary', description: 'Xem tổng hợp báo cáo', parentCode: 'collab.summary' },
+      
+      // Meetings
+      { code: 'collab.meetings', name: 'Meetings Module', description: 'Base meetings module access', parentCode: 'collab' },
+      { code: 'collab.meetings.view', name: 'View Meetings', description: 'Xem danh sách cuộc họp', parentCode: 'collab.meetings' },
+      { code: 'collab.meetings.create', name: 'Create Meetings', description: 'Tạo cuộc họp mới', parentCode: 'collab.meetings' },
+      { code: 'collab.meetings.join', name: 'Join Meetings', description: 'Tham gia cuộc họp', parentCode: 'collab.meetings' },
+      { code: 'collab.meetings.manage', name: 'Manage Meetings', description: 'Quản lý cuộc họp', parentCode: 'collab.meetings' },
+      { code: 'collab.meetings.chat', name: 'Meeting Chat', description: 'Trò chuyện trong cuộc họp', parentCode: 'collab.meetings' },
     ];
 
-    for (const permissionData of collabPermissions) {
-      const existing = await this.permissionRepository.findOne({ where: { code: permissionData.code } });
-      if (!existing) {
-        const permission = this.permissionRepository.create(permissionData);
-        await this.permissionRepository.save(permission);
-        console.log(`  ✓ Created permission: ${permissionData.code}`);
-      } else {
-        console.log(`  ℹ️ Permission already exists: ${permissionData.code}`);
+    // Seed permissions in order - first parent permissions, then child permissions
+    // This ensures that parent permissions exist before child permissions are created
+    const permissionsByLevel = {};
+    
+    // Group permissions by level (number of dots in code)
+    collabPermissions.forEach(permission => {
+      const level = permission.code.split('.').length - 1;
+      if (!permissionsByLevel[level]) {
+        permissionsByLevel[level] = [];
+      }
+      permissionsByLevel[level].push(permission);
+    });
+    
+    // Seed permissions level by level
+    const levels = Object.keys(permissionsByLevel).sort((a, b) => Number(a) - Number(b));
+    
+    for (const level of levels) {
+      console.log(`  🔹 Seeding level ${level} permissions...`);
+      
+      for (const permissionData of permissionsByLevel[level]) {
+        try {
+          // Check if parent permission exists if it has a parent
+          if (permissionData.parentCode) {
+            const parentExists = await this.permissionRepository.findOne({ 
+              where: { code: permissionData.parentCode } 
+            });
+            
+            if (!parentExists) {
+              console.log(`  ⚠️ Parent permission ${permissionData.parentCode} not found for ${permissionData.code}`);
+              console.log(`  🔄 Creating parent permission ${permissionData.parentCode} first...`);
+              
+              // Create a basic parent permission
+              const parentParts = permissionData.parentCode.split('.');
+              const parentName = parentParts[parentParts.length - 1].charAt(0).toUpperCase() + 
+                               parentParts[parentParts.length - 1].slice(1);
+              
+              const parentPermission = this.permissionRepository.create({
+                code: permissionData.parentCode,
+                name: `${parentName} Module`,
+                description: `Base ${parentName.toLowerCase()} module access`,
+                parentCode: parentParts.length > 1 ? parentParts.slice(0, -1).join('.') : null
+              });
+              
+              await this.permissionRepository.save(parentPermission);
+              console.log(`  ✓ Created missing parent permission: ${permissionData.parentCode}`);
+            }
+          }
+          
+          // Now create/update the permission
+          const existing = await this.permissionRepository.findOne({ where: { code: permissionData.code } });
+          if (!existing) {
+            const permission = this.permissionRepository.create(permissionData);
+            await this.permissionRepository.save(permission);
+            console.log(`  ✓ Created permission: ${permissionData.code}`);
+          } else {
+            // Update existing permission
+            await this.permissionRepository.update(
+              { code: permissionData.code },
+              { 
+                name: permissionData.name, 
+                description: permissionData.description,
+                parentCode: permissionData.parentCode
+              }
+            );
+            console.log(`  ℹ️ Updated permission: ${permissionData.code}`);
+          }
+        } catch (error) {
+          console.error(`  ❌ Error creating permission ${permissionData.code}: ${error.message}`);
+        }
       }
     }
 

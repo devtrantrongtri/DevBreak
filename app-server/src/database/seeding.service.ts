@@ -28,13 +28,32 @@ export class SeedingService {
   async seedAll(): Promise<void> {
     console.log('🌱 Starting database seeding...');
 
-    await this.seedPermissions();
-    await this.collabPermissionsService.seedCollabPermissions();
-    await this.menusService.seedMenus();
-    await this.seedGroupsUsersService.seedGroupsAndUsers();
-    await seedCollabData(this.dataSource);
+    try {
+      // Seed base permissions first
+      await this.seedPermissions();
+      console.log('✅ Base permissions seeded successfully');
+      
+      // Then seed collab permissions
+      await this.collabPermissionsService.seedCollabPermissions();
+      console.log('✅ Collab permissions seeded successfully');
+      
+      // Then seed menus
+      await this.menusService.seedMenus();
+      console.log('✅ Menus seeded successfully');
+      
+      // Then seed groups and users
+      await this.seedGroupsUsersService.seedGroupsAndUsers();
+      console.log('✅ Groups and users seeded successfully');
+      
+      // Finally seed collab data
+      await seedCollabData(this.dataSource);
+      console.log('✅ Collab data seeded successfully');
 
-    console.log('✅ Database seeding completed!');
+      console.log('✅ Database seeding completed!');
+    } catch (error) {
+      console.error('❌ Error during seeding:', error.message);
+      throw error;
+    }
   }
 
   private async seedPermissions(): Promise<void> {
