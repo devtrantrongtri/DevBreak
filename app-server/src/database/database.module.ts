@@ -9,6 +9,7 @@ import { User, Group, Permission, Menu, ActivityLog } from '../entities';
 import { AuthModule } from '../auth/auth.module';
 import { PermissionsModule } from '../permissions/permissions.module';
 import { MenusModule } from '../menus/menus.module';
+import { CollabModule } from '../collab/collab.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { MenusModule } from '../menus/menus.module';
     AuthModule,
     PermissionsModule,
     MenusModule,
+    CollabModule,
   ],
   controllers: [SeedingController, SystemInitializationController],
   providers: [SeedingService, SystemInitializationService, SeedGroupsUsersService],
